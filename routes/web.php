@@ -449,6 +449,10 @@ Route::get('/stok_masuk', [StokmasukController::class, 'index'])->name('stok_mas
 Route::get('/buatStokProduk', [StokmasukController::class, 'buatStokProduk'])->name('buatStokProduk');
 Route::post('/inputProdukMasuk', [StokmasukController::class, 'inputProdukMasuk'])->name('inputProdukMasuk');
 Route::get('/detailStokProduk', [StokmasukController::class, 'detailStokProduk'])->name('detailStokProduk');
+Route::post('/editStokMasuk', [StokmasukController::class, 'editStokMasuk'])->name('editStokMasuk');
+Route::get('/printStokMasuk', [StokmasukController::class, 'printStokMasuk'])->name('printStokMasuk');
+Route::get('/deleteStok', [StokmasukController::class, 'deleteStok'])->name('deleteStok');
+Route::post('/tambahProdukMasuk', [StokmasukController::class, 'tambahProdukMasuk'])->name('tambahProdukMasuk');
 
 
 // delete bersakala
