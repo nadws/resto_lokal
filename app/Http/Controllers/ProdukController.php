@@ -91,7 +91,7 @@ class ProdukController extends Controller
             'nm_produk' => $r->nm_produk,
             'id_kategori' => $r->id_kategori,
             'id_satuan' => $r->id_satuan,
-            'stok' => $r->stok,
+            // 'stok' => $r->stok,
             'harga' => $r->harga,
             'harga_modal' => $r->harga_modal,
             'komisi' => $r->komisi,

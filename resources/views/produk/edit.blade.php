@@ -42,13 +42,13 @@
                 </select>
             </div>
 
-            <div class="col-lg-4 mb-2">
+            {{-- <div class="col-lg-4 mb-2">
                 <label for="">
                     <dt>Stok</dt>
                 </label>
                 <input type="text" class="form-control" name="stok" value="{{ $produk->stok }}" placeholder="cth : 1"
                     required>
-            </div>
+            </div> --}}
 
             <div class="col-lg-4 mb-2">
                 <label for="">

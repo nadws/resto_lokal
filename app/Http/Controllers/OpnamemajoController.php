@@ -79,7 +79,7 @@ class OpnamemajoController extends Controller
     public function inputOpname(Request $r)
     {
         $id_produk = $r->id_produk_opname;
-        $kode_opname = date('ymd') . strtoupper(Str::random(3));
+        $kode_opname = 'OPM' . date('ymd') . strtoupper(Str::random(3));
         foreach ($id_produk as $id) {
 
             $get_produk = DB::selectOne("SELECT a.id_produk, a.komisi,  a.nm_produk, a.sku, a.harga, b.satuan , c.nm_kategori, a.id_lokasi, d.debit, d.kredit,e.kredit_penjualan
@@ -229,11 +229,10 @@ class OpnamemajoController extends Controller
         $data = array(
             'title'  => "Detail Opname Produk",
             'cek_status' => DB::table('tb_opname')->where('kode_opname', $kode_opname)->groupBy('kode_opname')->first(),
-            // 'produk'   => $this->db->join('tb_kategori', 'tb_produk.id_kategori = tb_kategori.id_kategori', 'left')->get('tb_produk')->result(),
-            // 'kategori'    => $this->db->get('tb_kategori')->result(),
-            'opname' => DB::table('tb_opname')->join('tb_produk', 'tb_opname.id_produk', 'tb_produk.id_produk')
+
+            'opname' => DB::table('tb_stok_produk')->join('tb_produk', 'tb_stok_produk.id_produk', 'tb_produk.id_produk')
                 ->join('tb_kategori_majo', 'tb_produk.id_kategori', 'tb_kategori_majo.id_kategori')->join('tb_satuan_majo', 'tb_produk.id_satuan', 'tb_satuan_majo.id_satuan')
-                ->where('tb_opname.kode_opname', $kode_opname)->get(),
+                ->where('tb_stok_produk.kode_stok_produk', $kode_opname)->get(),
             'kode_opname' => $kode_opname,
             'produk' => DB::select("SELECT a.*,b.*,c.* FROM tb_produk as a
             LEFT JOIN tb_kategori_majo as b ON a.id_kategori = b.id_kategori

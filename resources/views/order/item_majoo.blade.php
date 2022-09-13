@@ -15,13 +15,14 @@
             <?= number_format($value->harga) ?>
         </h6>
         <p>Tersedia
-            <?= $value->stok ?> Stok Barang
+            <?= $value->debit - ($value->kredit + $value->kredit_penjualan) ?> Stok Barang
         </p>
         <div class="row">
             <div class="col-sm-3 col-md-3">
                 <div class="form-group">
                     <label for="">Jumlah *</label>
-                    <input type="number" id="cart_jumlah" min="1" max="<?= $value->stok ?>" name="jumlah"
+                    <input type="number" id="cart_jumlah" min="1"
+                        max="<?= $value->debit - ($value->kredit + $value->kredit_penjualan) ?>" name="jumlah"
                         class="form-control" value="1" required="">
                     <input type="hidden" id="cart_id" name="id" value="<?= $value->id_produk ?>">
                 </div>

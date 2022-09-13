@@ -2,7 +2,7 @@
 
     @foreach ($produk as $p)
     <div class="col-md-3">
-        @if ($p->stok < 1) <a class="input_cart2 stok_habis">
+        @if ($p->debit - ($p->kredit + $p->kredit_penjualan) < 1) <a class="input_cart2 stok_habis">
             <div class="card" style="background: rgba(0, 0, 0, 0.3);">
                 <div style="background-color: rgba(0, 0, 0, 0.5); padding:5px 0 5px;">
 
