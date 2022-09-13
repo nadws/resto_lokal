@@ -174,7 +174,7 @@ class OrderController extends Controller
         $meja = DB::select(
             DB::raw("SELECT *
         FROM tb_meja AS a
-        WHERE a.id_meja NOT IN (SELECT b.id_meja from tb_order AS b WHERE b.tgl = '$date' or b.aktif = '1' ) and a.id_lokasi = '$id_lokasi' and a.id_distribusi = '$id_me'"),
+        WHERE a.id_meja NOT IN (SELECT b.id_meja from tb_order AS b WHERE b.tgl = '$date' and b.aktif = '1' and void != '1') and a.id_lokasi = '$id_lokasi' and a.id_distribusi = '$id_me'"),
         );
 
         foreach ($meja as $m) {

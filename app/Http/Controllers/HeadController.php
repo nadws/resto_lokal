@@ -14,8 +14,8 @@ class HeadController extends Controller
     public function index(Request $request)
     {
         $id_user = Auth::user()->id;
-        $id_menu = DB::table('tb_permission')->select('id_menu')->where('id_user',$id_user)->where('id_menu', 27)->first();
-        if(empty($id_menu)) {
+        $id_menu = DB::table('tb_permission')->select('id_menu')->where('id_user', $id_user)->where('id_menu', 27)->first();
+        if (empty($id_menu)) {
             return back();
         } else {
             if (empty($request->id)) {
@@ -67,7 +67,7 @@ class HeadController extends Controller
             'nav' => '5'
         ];
 
-        return view('head.view1jam',$data);
+        return view('head.view1jam', $data);
     }
     public function getSearchHead(Request $request)
     {
@@ -89,7 +89,7 @@ class HeadController extends Controller
         left join tb_meja as d on d.id_meja = a.id_meja
         LEFT JOIN tb_transaksi AS c ON c.no_order = a.no_order
         left join view_menu as e on a.id_harga = e.id_harga
-        WHERE e.nm_menu LIKE '%$s%' AND a.selesai = 'dimasak' AND a.aktif = '1' AND a.id_lokasi = '$lokasi' and a.id_distribusi = '$id_distribusi'
+        WHERE e.nm_menu LIKE '%$s%' AND a.selesai = 'dimasak' AND a.aktif = '1' and a.void = '0' AND a.id_lokasi = '$lokasi' and a.id_distribusi = '$id_distribusi'
         group by a.no_order order by a.id_distribusi , a.id_meja ASC
         ");
 
@@ -132,7 +132,7 @@ class HeadController extends Controller
         LEFT JOIN tb_distribusi AS b ON b.id_distribusi = a.id_distribusi
         left join tb_meja as d on d.id_meja = a.id_meja
         LEFT JOIN tb_transaksi AS c ON c.no_order = a.no_order
-        WHERE a.aktif = '1' AND a.id_lokasi = '$lokasi' and a.id_distribusi = '$id_distribusi'
+        WHERE a.aktif = '1' AND a.id_lokasi = '$lokasi' and a.id_distribusi = '$id_distribusi' and a.void ='0'
         group by a.no_order order by a.id_distribusi , a.id_meja ASC
         ");
 
@@ -196,7 +196,7 @@ class HeadController extends Controller
             'title'    => 'Menu | Buku Tugas',
             'tb_order' => DB::join('view_menu', 'view_menu.id_harga = tb_order.id_harga')->where('tb_order', ['tb_order.aktif' => '1'])->get(),
             'kategori' => DB::table('tb_kategori')->where('lokasi', 'TAKEMORI')->get(),
-           'distribusi' => DB::select("SELECT a.*, c.jumlah
+            'distribusi' => DB::select("SELECT a.*, c.jumlah
             FROM tb_distribusi AS a
             LEFT JOIN (SELECT b.id_distribusi , COUNT(b.id_order) AS jumlah
             FROM tb_order AS b

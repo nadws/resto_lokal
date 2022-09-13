@@ -34,8 +34,8 @@
             <td class="bg-info" width="8%" style="white-space: nowrap;">
                 <?= $m->nm_meja ?>
                 <span style="font-size: 10px; font-weight: bold">
-                            <dt>({{ $m->warna }})</dt>
-                        </span>
+                    <dt>({{ $m->warna }}) </dt>
+                </span>
             </td>
             <td class="bg-info" style="vertical-align: middle;">
                 <a class="muncul btn btn-primary btn-sm">View</a>
@@ -61,12 +61,12 @@
                         class="fas fa-print"></i> Copy Checker</a>
                 <?php endif ?>
                 <?php if ($m->t_prn == 'T') : ?>
-                    <a href="{{ route('checker_tamu', ['no' => $m->no_order]) }}" class="btn btn-success btn-sm mb-2"><i
-                            class="fas fa-print"></i> Checker tamu</a>
-                    <?php else : ?>
-                    <a href="{{ route('copy_checker_tamu', ['no' => $m->no_order]) }}"
-                        class="btn btn-success btn-sm mb-2"><i class="fas fa-print"></i> Copy Checker tamu</a>
-                    <?php endif ?>
+                <a href="{{ route('checker_tamu', ['no' => $m->no_order]) }}" class="btn btn-success btn-sm mb-2"><i
+                        class="fas fa-print"></i> Checker tamu</a>
+                <?php else : ?>
+                <a href="{{ route('copy_checker_tamu', ['no' => $m->no_order]) }}"
+                    class="btn btn-success btn-sm mb-2"><i class="fas fa-print"></i> Copy Checker tamu</a>
+                <?php endif ?>
                 <a href="{{ route('all_checker', ['no' => $m->no_order]) }}" class="btn btn-success btn-sm mb-2"><i
                         class="fas fa-print"></i> Print all</a>
 
@@ -135,27 +135,27 @@
                 ->where('id_lokasi', $loc)
                 ->where('id_meja', $m->id_meja)
                 ->get(); ?>
-                @php
-                $majo = DB::select("SELECT a.*, c.nm_produk
-                FROM tb_pembelian AS a
-                LEFT JOIN tb_produk AS c ON c.id_produk = a.id_produk
-                WHERE a.no_meja = '$m->id_meja' AND a.lokasi = '$loc' and a.selesai = 'diantar'
-                GROUP BY a.id_pembelian");
+        @php
+        $majo = DB::select("SELECT a.*, c.nm_produk
+        FROM tb_pembelian AS a
+        LEFT JOIN tb_produk AS c ON c.id_produk = a.id_produk
+        WHERE a.no_meja = '$m->id_meja' AND a.lokasi = '$loc' and a.selesai = 'diantar'
+        GROUP BY a.id_pembelian");
 
-                $majo_hide = DB::select("SELECT a.*, c.nm_produk
-                FROM tb_pembelian AS a
-                LEFT JOIN tb_produk AS c ON c.id_produk = a.id_produk
-                WHERE a.no_meja = '$m->id_meja' AND a.lokasi = '$loc' and a.selesai = 'selesai'
-                GROUP BY a.id_pembelian");
-                @endphp
+        $majo_hide = DB::select("SELECT a.*, c.nm_produk
+        FROM tb_pembelian AS a
+        LEFT JOIN tb_produk AS c ON c.id_produk = a.id_produk
+        WHERE a.no_meja = '$m->id_meja' AND a.lokasi = '$loc' and a.selesai = 'selesai'
+        GROUP BY a.id_pembelian");
+        @endphp
         @foreach ($menu2 as $m)
         @php
-            if ($m->nm_menu == '') {
-            continue;
-            } else {
+        if ($m->nm_menu == '') {
+        continue;
+        } else {
 
-            }
-            @endphp
+        }
+        @endphp
         <tr>
             <td></td>
             <td style="text-transform: lowercase;">{{ $m->nm_menu }}</td>
@@ -194,25 +194,25 @@
         </tr>
         @endforeach
         @foreach ($majo_hide as $m)
-            <tr>
-                <td></td>
-                <td style="text-transform: lowercase;">{{ $m->nm_produk }}</td>
-                <td>{{ $m->jumlah }}</td>
-                <td>Selesai</td>
-                <?php foreach ($waitress as $k) : ?>
-                <?php if ($k->nama == $m->pengantar) : ?>
-                <td><i class="text-success fas fa-check-circle"></i></td>
-                <?php else : ?>
-                <td></td>
-                <?php endif; ?>
-                <?php endforeach ?>
+        <tr>
+            <td></td>
+            <td style="text-transform: lowercase;">{{ $m->nm_produk }}</td>
+            <td>{{ $m->jumlah }}</td>
+            <td>Selesai</td>
+            <?php foreach ($waitress as $k) : ?>
+            <?php if ($k->nama == $m->pengantar) : ?>
+            <td><i class="text-success fas fa-check-circle"></i></td>
+            <?php else : ?>
+            <td></td>
+            <?php endif; ?>
+            <?php endforeach ?>
 
-                <td>
+            <td>
 
-                </td>
-                <td></td>
-            </tr>
-            @endforeach
+            </td>
+            <td></td>
+        </tr>
+        @endforeach
         <?php foreach ($menu as $m) :
         if ($m->nm_menu == '') {
                continue;
@@ -275,38 +275,37 @@
                 }
             ?>
 
-            <tr class="header">
-                <td></td>
-                <td style="white-space:nowrap;text-transform: lowercase;">{{ $m->nm_produk }}</td>
-                <td> {{ $m->jumlah }}</td>
-                <?php if (!empty($m->pengantar)) : ?>
-                <td><a kode="{{ $m->id_pembelian }}" class="btn btn-info btn-sm selesai_majo"><i
-                            class="fas fa-thumbs-up"></i></a>
-                </td>
-                <?php else : ?>
-                <td><a kode="{{ $m->id_pembelian }}" class="btn btn-info btn-sm gagal"><i
-                            class="fas fa-thumbs-up"></i></a>
-                </td>
-                <?php endif ?>
-                <?php foreach ($waitress as $k) : ?>
-                <?php if (!empty($m->pengantar)) : ?>
-                <?php if ($m->pengantar == $k->nama) : ?>
-                <td><a kode="{{ $m->id_pembelian }}" class="btn btn-warning btn-sm un_waitress_majo"><i
-                            class="fas fa-user-check"></i></a></td>
-                <?php else : ?>
-                <td></td>
-                <?php endif ?>
+        <tr class="header">
+            <td></td>
+            <td style="white-space:nowrap;text-transform: lowercase;">{{ $m->nm_produk }}</td>
+            <td> {{ $m->jumlah }}</td>
+            <?php if (!empty($m->pengantar)) : ?>
+            <td><a kode="{{ $m->id_pembelian }}" class="btn btn-info btn-sm selesai_majo"><i
+                        class="fas fa-thumbs-up"></i></a>
+            </td>
+            <?php else : ?>
+            <td><a kode="{{ $m->id_pembelian }}" class="btn btn-info btn-sm gagal"><i class="fas fa-thumbs-up"></i></a>
+            </td>
+            <?php endif ?>
+            <?php foreach ($waitress as $k) : ?>
+            <?php if (!empty($m->pengantar)) : ?>
+            <?php if ($m->pengantar == $k->nama) : ?>
+            <td><a kode="{{ $m->id_pembelian }}" class="btn btn-warning btn-sm un_waitress_majo"><i
+                        class="fas fa-user-check"></i></a></td>
+            <?php else : ?>
+            <td></td>
+            <?php endif ?>
 
-                <?php else : ?>
-                <td><a kode="{{ $m->id_pembelian }}" kry="{{ $k->nama }}"
-                        class="btn btn-sm btn-success waitress_majo"><i class="fas fa-check"></i></a></td>
-                <?php endif ?>
-                <?php endforeach ?>
-                <td></td>
-                <td>{{ date('H:i',strtotime($m->tgl_input)) }}</td>
-            </tr>
-
+            <?php else : ?>
+            <td><a kode="{{ $m->id_pembelian }}" kry="{{ $k->nama }}" class="btn btn-sm btn-success waitress_majo"><i
+                        class="fas fa-check"></i></a></td>
+            <?php endif ?>
             <?php endforeach ?>
+            <td></td>
+            <td>{{ date('H:i',strtotime($m->tgl_input)) }}</td>
+        </tr>
+
+        <?php endforeach ?>
         @endforeach
 
     </tbody>

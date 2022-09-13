@@ -2,19 +2,20 @@
     .table tr:not(.header) {
         display: none;
     }
-
 </style>
 
 <table class="table" width="100%">
     <thead>
         <tr class="header">
-            <th class="sticky-top th-atas">Meja</th>
+            <th class="sticky-top th-atas">Mejas</th>
             <th class="sticky-top th-atas">Menu</th>
             <th class="sticky-top th-atas">Request</th>
             <th class="sticky-top th-atas">Qty</th>
             <th class="sticky-top th-atas">Status</th>
             <?php foreach ($tb_koki as $k) : ?>
-            <th class="sticky-top th-atas"><?= $k->nama ?></th>
+            <th class="sticky-top th-atas">
+                <?= $k->nama ?>
+            </th>
             <?php endforeach ?>
             <th class="sticky-top th-atas">Time In / Durasi</th>
         </tr>
@@ -22,14 +23,18 @@
     <tbody style="font-size: 18px;" id="tugas_head">
         <?php foreach ($meja as $m) : ?>
         <tr class="header">
-            <td class="bg-info"><?= $m->nm_meja ?></td>
+            <td class="bg-info">
+                <?= $m->nm_meja ?>
+            </td>
             <td class="bg-info" style="vertical-align: middle;"><a class="muncul btn btn-primary btn-sm">View</a>
             </td>
             <td class="bg-info"></td>
             <td class="bg-info"></td>
             <td class="bg-info"></td>
             <?php foreach ($tb_koki as $k) : ?>
-            <td class="bg-info" style="vertical-align: middle;"><?= $k->nama ?></td>
+            <td class="bg-info" style="vertical-align: middle;">
+                <?= $k->nama ?>
+            </td>
             <?php endforeach ?>
             <td colspan="50" class="bg-info"></td>
         </tr>
@@ -49,14 +54,20 @@
         $no = 1;
         ?>
         @php
-            $setMenit = DB::table('tb_menit')->where('id_lokasi', $lokasi)->first();
+        $setMenit = DB::table('tb_menit')->where('id_lokasi', $lokasi)->first();
         @endphp
         <?php foreach ($menu as $m) : ?>
         <tr class="header">
             <td></td>
-            <td style="white-space:nowrap;text-transform: lowercase;"><?= $m->nm_menu ?> <span class="text-danger">({{$m->ttlMenuSemua}})</span></td>
-            <td><?= $m->request ?></td>
-            <td><?= $m->qty ?></td>
+            <td style="white-space:nowrap;text-transform: lowercase;">
+                <?= $m->nm_menu ?> <span class="text-danger">({{$m->ttlMenuSemua}})</span>
+            </td>
+            <td>
+                <?= $m->request ?>
+            </td>
+            <td>
+                <?= $m->qty ?>
+            </td>
             <?php if ($m->selesai == 'dimasak') : ?>
             <?php if ($m->id_koki1 != '0') : ?>
             <td><a kode="<?= $m->id_order ?>" class="btn btn-info btn-sm selesai"><i class="fas fa-thumbs-up"></i></a>
@@ -95,7 +106,9 @@
                         class="fas fa-check"></i></a></td>
             <?php endif ?>
             <?php endforeach ?>
-            <td style="font-weight: bold;"><?= date('H:i', strtotime($m->j_mulai)) ?></td>
+            <td style="font-weight: bold;">
+                <?= date('H:i', strtotime($m->j_mulai)) ?>
+            </td>
             <?php else : ?>
             <td style="text-decoration: line-through; "><a href="<?= base_url("orderan/order/$m->no_order") ?>"
                     style="color:black;">SELESAI</a></td>
@@ -103,9 +116,13 @@
             <td></td>
             <?php endforeach ?>
             <?php if (date('H:i', strtotime($m->j_selesai)) < date('H:i', strtotime($m->j_mulai . '+'.$setMenit->menit.'minutes'))) : ?>
-            <td><b style="color:blue;"><?= date('H:i', strtotime($m->j_selesai)) ?></b></td>
+            <td><b style="color:blue;">
+                    <?= date('H:i', strtotime($m->j_selesai)) ?>
+                </b></td>
             <?php else : ?>
-            <td><b style="color:red;"><?= date('H:i', strtotime($m->j_selesai)) ?></b></td>
+            <td><b style="color:red;">
+                    <?= date('H:i', strtotime($m->j_selesai)) ?>
+                </b></td>
             <?php endif ?>
             <?php endif ?>
         </tr>

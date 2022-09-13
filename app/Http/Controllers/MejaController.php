@@ -106,8 +106,8 @@ class MejaController extends Controller
         }
 
         $meja = DB::select(
-            DB::raw(
-                "SELECT a.id_meja,a.warna, c.nm_meja, a.no_order, RIGHT(a.no_order,2) AS kd, b.nm_distribusi,a.selesai,
+
+            "SELECT a.id_meja,a.warna, c.nm_meja, a.no_order, RIGHT(a.no_order,2) AS kd, b.nm_distribusi,a.selesai,
                 a.pengantar,  SUM(a.qty) AS qty1 ,  e.qty2 , min(a.print) as prn , min(a.checker_tamu) as t_prn , min(a.copy_print) as c_prn, MIN(a.j_mulai) as jam_datang, timestampdiff(MINUTE, MIN(a.j_mulai), MAX(a.wait)) as total_jam_pesan
         FROM tb_order AS a
         left join tb_meja as c on c.id_meja = a.id_meja
@@ -116,9 +116,9 @@ class MejaController extends Controller
         SELECT d.no_order , SUM(d.qty) qty2 FROM tb_order2 AS d
         GROUP BY d.no_order
         ) AS e ON e.no_order = a.no_order
-        WHERE a.aktif = '1' and  a.id_lokasi = '$loc' and a.id_distribusi = '$id_distribusi' AND a.void = 0
-        group by a.no_order order by a.id_distribusi , a.id_meja  ASC",
-            ),
+        WHERE a.aktif = '1' and  a.id_lokasi = '$loc' and a.id_distribusi = '$id_distribusi' AND a.void = '0'
+        group by a.no_order order by a.id_distribusi , a.id_meja  ASC"
+
         );
 
         $data = [
