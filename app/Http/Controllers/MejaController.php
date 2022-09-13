@@ -312,7 +312,7 @@ class MejaController extends Controller
                 ->first(),
             'batas' => DB::table('tb_batas_ongkir')
                 ->first(),
-                'majo' => $majo
+            'majo' => $majo
         ];
         return view('meja.bill', $data);
     }
@@ -522,7 +522,7 @@ class MejaController extends Controller
                 ->leftJoin('view_menu as c', 'c.id_harga', '=', 'a.id_harga')
                 ->where('a.no_order', $id)
                 ->where('c.tipe', 'food')
-                ->where('c.id_kategori','!=', '8')
+                ->where('c.id_kategori', '!=', '8')
                 ->where('a.checker_tamu', 'T')
                 ->groupBy('a.no_order')
                 ->first(),
@@ -609,7 +609,7 @@ class MejaController extends Controller
                 ->leftJoin('view_menu as c', 'c.id_harga', '=', 'a.id_harga')
                 ->where('a.no_order', $id)
                 ->where('c.tipe', 'food')
-                ->where('c.id_kategori','!=', '8')
+                ->where('c.id_kategori', '!=', '8')
                 ->where('a.copy_checkert_tamu', 'T')
                 ->groupBy('a.no_order')
                 ->first(),
@@ -689,9 +689,43 @@ class MejaController extends Controller
         $id_dis = $request->id;
 
         if ($id_dis == '1' || $id_dis == '3') {
-            $produk =  DB::table('tb_produk')->where('id_lokasi', "$lokasi")->where('id_kategori', '!=', '11')->where('stok', '>', '0')->get();
+            $produk =  DB::select("SELECT a.id_produk, a.komisi,  a.nm_produk, a.sku, a.harga, b.satuan , c.nm_kategori, a.id_lokasi, d.debit, d.kredit,e.kredit_penjualan
+            FROM tb_produk AS a
+            LEFT JOIN tb_satuan_majo AS b ON b.id_satuan = a.id_satuan
+            LEFT JOIN tb_kategori_majo AS c ON c.id_kategori = a.id_kategori
+            
+            LEFT JOIN (
+            SELECT d.id_produk, SUM(d.debit) AS debit, SUM(d.kredit) AS kredit
+            FROM tb_stok_produk AS d 
+            GROUP BY d.id_produk
+            ) AS d ON d.id_produk = a.id_produk
+
+            LEFT JOIN (
+            SELECT e.id_produk , SUM(e.jumlah) AS kredit_penjualan
+            FROM tb_pembelian AS e 
+            GROUP BY e.id_produk
+            )AS e ON e.id_produk = a.id_produk
+            
+            WHERE a.id_lokasi = '$lokasi' and a.id_kategori != '11' and (d.debit - (d.kredit + e.kredit_penjualan)) > 0");
         } else {
-            $produk =  DB::table('tb_produk')->where('id_lokasi', "$lokasi")->where('id_kategori', '=', '11')->where('stok', '>', '0')->get();
+            $produk =  DB::select("SELECT a.id_produk, a.komisi,  a.nm_produk, a.sku, a.harga, b.satuan , c.nm_kategori, a.id_lokasi, d.debit, d.kredit,e.kredit_penjualan
+            FROM tb_produk AS a
+            LEFT JOIN tb_satuan_majo AS b ON b.id_satuan = a.id_satuan
+            LEFT JOIN tb_kategori_majo AS c ON c.id_kategori = a.id_kategori
+            
+            LEFT JOIN (
+            SELECT d.id_produk, SUM(d.debit) AS debit, SUM(d.kredit) AS kredit
+            FROM tb_stok_produk AS d 
+            GROUP BY d.id_produk
+            ) AS d ON d.id_produk = a.id_produk
+
+            LEFT JOIN (
+            SELECT e.id_produk , SUM(e.jumlah) AS kredit_penjualan
+            FROM tb_pembelian AS e 
+            GROUP BY e.id_produk
+            )AS e ON e.id_produk = a.id_produk
+            
+            WHERE a.id_lokasi = '$lokasi' and a.id_kategori = '11' and (d.debit - (d.kredit + e.kredit_penjualan)) > 0");
         }
         $order = DB::table('tb_order')
             ->where('no_order', $no_order)
