@@ -75,7 +75,7 @@
                                                     <tr>
                                                         <?php endif; ?>
                                                         <input type="hidden" name="id_opname[]"
-                                                            value="<?= $op->id_opname ?>">
+                                                            value="<?= $op->id_stok_produk ?>">
                                                         <input type="hidden" name="id_produk[]"
                                                             value="<?= $op->id_produk ?>">
                                                         <td>
@@ -89,15 +89,22 @@
                                                         </td>
                                                         <td>
                                                             <?= $op->stok_program ?>
+                                                            <input type="hidden" name="stok_program[]"
+                                                                value="<?= $op->stok_program ?>"
+                                                                style="width: 120px; text-align: center;"
+                                                                class="form-control fill">
                                                         </td>
                                                         <td>
-                                                            <center><input type="text" name="stok_aktual[]"
+                                                            <center>
+                                                                <input type="text" name="stok_aktual[]"
                                                                     value="<?= $op->stok_aktual ?>"
                                                                     style="width: 120px; text-align: center;"
-                                                                    class="form-control fill"></center>
+                                                                    class="form-control fill">
+                                                            </center>
                                                         </td>
                                                         <td>
                                                             <?= $selisih ?>
+
                                                         </td>
                                                         <td>
                                                             <?= number_format($op->harga, 0) ?>

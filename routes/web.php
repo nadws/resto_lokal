@@ -447,7 +447,7 @@ Route::get('/tambahOpname', [OpnamemajoController::class, 'tambahOpname'])->name
 // stok masuk majo
 Route::get('/stok_masuk', [StokmasukController::class, 'index'])->name('stok_masuk');
 Route::get('/buatStokProduk', [StokmasukController::class, 'buatStokProduk'])->name('buatStokProduk');
-Route::get('/inputProdukMasuk', [StokmasukController::class, 'inputProdukMasuk'])->name('inputProdukMasuk');
+Route::post('/inputProdukMasuk', [StokmasukController::class, 'inputProdukMasuk'])->name('inputProdukMasuk');
 Route::get('/detailStokProduk', [StokmasukController::class, 'detailStokProduk'])->name('detailStokProduk');
 
 

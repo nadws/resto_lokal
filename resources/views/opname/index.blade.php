@@ -43,7 +43,7 @@
                                                 $i=1;
                                                 foreach ($opname as $d) : ?>
                                                 <tr
-                                                    onclick="window.location = '{{route('detailOpname', ['kode_opname' => $d->kode_opname])}}'">
+                                                    onclick="window.location = '{{route('detailOpname', ['kode_opname' => $d->kode_stok_produk])}}'">
                                                     <td>
                                                         <?=$i++;?>
                                                     </td>
@@ -52,7 +52,7 @@
                                                         <?= date('H:i', strtotime($d->tgl)) ?>
                                                     </td>
                                                     <td>
-                                                        <?= $d->kode_opname ?>
+                                                        <?= $d->kode_stok_produk ?>
                                                     </td>
                                                     <td>
                                                         <?= $d->status ?>

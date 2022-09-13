@@ -133,7 +133,7 @@
                                     <?= $p->satuan ?>
                                 </td>
                                 <td>
-                                    <?= $p->stok ?>
+                                    <?= $p->debit - ($p->kredit + $p->kredit_penjualan) ?>
                                 </td>
                                 <td>
                                     <?= number_format($p->harga, 0) ?>

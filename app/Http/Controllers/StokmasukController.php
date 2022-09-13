@@ -32,7 +32,7 @@ class StokmasukController extends Controller
                 'title' => 'Produk Majo',
                 'title' => 'Stok Produk',
                 'stokProduk' => DB::select("SELECT a.*, SUM(a.debit) as debit, SUM(a.kredit) as kredit FROM tb_stok_produk as a
-                WHERE a.tgl BETWEEN '$tgl1' AND '$tgl2' AND a.id_lokasi = '$id_lokasi'
+                WHERE a.tgl BETWEEN '$tgl1' AND '$tgl2' AND a.id_lokasi = '$id_lokasi' and a.ket = 'stok masuk'
                 GROUP BY a.kode_stok_produk
                 ORDER BY a.id_stok_produk DESC"),
 
@@ -55,11 +55,24 @@ class StokmasukController extends Controller
             $data = [
                 'title'  => "Create Stok Masuk",
                 'kategori' => DB::table('tb_kategori_majo')->get(),
-                'produk' => DB::select("SELECT a.*,b.*,c.* FROM tb_produk as a
-                LEFT JOIN tb_kategori_majo as b ON a.id_kategori = b.id_kategori
-                LEFT JOIN tb_satuan_majo as c ON a.id_satuan = c.id_satuan
-                WHERE a.id_lokasi = '$id_lokasi'
-                ORDER BY a.nm_produk ASC"),
+                'produk' => DB::select("SELECT a.id_produk, a.komisi,  a.nm_produk, a.sku, a.harga, b.satuan , c.nm_kategori, a.id_lokasi, d.debit, d.kredit,e.kredit_penjualan
+                FROM tb_produk AS a
+                LEFT JOIN tb_satuan_majo AS b ON b.id_satuan = a.id_satuan
+                LEFT JOIN tb_kategori_majo AS c ON c.id_kategori = a.id_kategori
+                
+                LEFT JOIN (
+                SELECT d.id_produk, SUM(d.debit) AS debit, SUM(d.kredit) AS kredit
+                FROM tb_stok_produk AS d 
+                GROUP BY d.id_produk
+                ) AS d ON d.id_produk = a.id_produk
+
+                LEFT JOIN (
+                SELECT e.id_produk , SUM(e.jumlah) AS kredit_penjualan
+                FROM tb_pembelian AS e 
+                GROUP BY e.id_produk
+                )AS e ON e.id_produk = a.id_produk
+                
+                WHERE a.id_lokasi = '$id_lokasi'"),
                 'logout' => $r->session()->get('logout'),
             ];
             return view('stokmajo.buat', $data);
@@ -69,8 +82,7 @@ class StokmasukController extends Controller
     {
         $id_produk = $r->id_stok_produk;
         $kode_stok_produk = 'INV' . date('ymd') . strtoupper(Str::random(3));
-        $id_user = Auth::user()->id;
-        $admin = $id_user->id_user;
+
         $id_lokasi = $r->session()->get('id_lokasi');
         foreach ($id_produk as $id) {
             $get_produk = Produk::where('id_produk', $id)->first();
@@ -82,7 +94,7 @@ class StokmasukController extends Controller
                 'debit' => 0,
                 'kredit' => 0,
                 'harga' => $get_produk->harga,
-                'admin' => $admin,
+                'admin' => Auth::user()->nama,
                 'jenis' => 'Masuk',
                 'status' => 'Draft',
                 'tgl_input' => date('Y-m-d H:i:s'),
@@ -90,7 +102,7 @@ class StokmasukController extends Controller
                 'ket' => 'stok masuk',
                 'id_lokasi' => $id_lokasi,
             ];
-            DB::table('stok_produk')->insert($data);
+            DB::table('tb_stok_produk')->insert($data);
         }
         return redirect()->route('detailStokProduk', ['kode' => $kode_stok_produk]);
     }

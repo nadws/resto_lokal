@@ -54,20 +54,21 @@
                                         <td>{{$p->nm_produk}}</td>
                                         <td>{{$p->sku}}</td>
                                         <td>{{$p->nm_kategori}}</td>
-                                        <td>{{$p->stok}}</td>
+                                        <td>{{$p->debit - ($p->kredit + $p->kredit_penjualan)}}</td>
                                         <td>{{$p->satuan}}</td>
                                         <td>{{number_format($p->harga,0)}}</td>
                                         <td>{{$p->komisi}} %</td>
                                         <td>
                                             <a href="#" data-toggle="modal" data-target="#edit"
                                                 id_produk="{{$p->id_produk}}" class="btn btn-info btn-sm btn_edit"><i
-                                                    class="fas fa-edit"></i></a>
-
+                                                    class="fas fa-edit"></i>
+                                            </a>
 
                                             <a href="{{ route('delete_majo', ['id_produk' => $p->id_produk]) }}"
                                                 onclick="return confirm('Apakah anda yakin ?')"
                                                 class="btn btn-sm btn-danger"><i
-                                                    class="fas text-light fa-trash-alt"></i></a>
+                                                    class="fas text-light fa-trash-alt"></i>
+                                            </a>
                                         </td>
                                     </tr>
                                     @endforeach

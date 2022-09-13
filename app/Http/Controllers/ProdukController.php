@@ -21,12 +21,24 @@ class ProdukController extends Controller
 
             $data = [
                 'title' => 'Produk Majo',
-                'produk' => DB::table('tb_produk as a')
-                    ->join('tb_satuan_majo as b', 'a.id_satuan', '=', 'b.id_satuan')
-                    ->join('tb_kategori_majo as c', 'a.id_kategori', '=', 'c.id_kategori')
-                    ->where('a.id_lokasi', $id_lokasi)
-                    ->orderBy('a.id_produk', 'DESC')
-                    ->get(),
+                'produk' => DB::select("SELECT a.id_produk, a.komisi,  a.nm_produk, a.sku, a.harga, b.satuan , c.nm_kategori, a.id_lokasi, d.debit, d.kredit,e.kredit_penjualan
+                FROM tb_produk AS a
+                LEFT JOIN tb_satuan_majo AS b ON b.id_satuan = a.id_satuan
+                LEFT JOIN tb_kategori_majo AS c ON c.id_kategori = a.id_kategori
+                
+                LEFT JOIN (
+                SELECT d.id_produk, SUM(d.debit) AS debit, SUM(d.kredit) AS kredit
+                FROM tb_stok_produk AS d 
+                GROUP BY d.id_produk
+                ) AS d ON d.id_produk = a.id_produk
+
+                LEFT JOIN (
+                SELECT e.id_produk , SUM(e.jumlah) AS kredit_penjualan
+                FROM tb_pembelian AS e 
+                GROUP BY e.id_produk
+                )AS e ON e.id_produk = a.id_produk
+                
+                WHERE a.id_lokasi = '$id_lokasi'"),
                 'kategori' => DB::table('tb_kategori_majo')->get(),
                 'satuan' => DB::table('tb_satuan_majo')->get(),
 
