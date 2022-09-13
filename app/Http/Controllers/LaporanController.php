@@ -44,53 +44,62 @@ class LaporanController extends Controller
         $jml_telat = DB::selectOne("SELECT SUM(qty) AS jml_telat FROM view_koki_masak WHERE tgl >= '$tgl1' AND tgl <= '$tgl2' AND id_lokasi = $loc AND menit_bagi > 25");
         $jml_ontime = DB::selectOne("SELECT SUM(qty) AS jml_ontime FROM view_koki_masak WHERE tgl >= '$tgl1' AND tgl <= '$tgl2' AND id_lokasi = $loc AND menit_bagi <= 25");
 
+        $majo = DB::selectOne("SELECT SUM(a.bayar) AS bayar_majo
+        FROM tb_invoice AS a
+        WHERE a.tgl_jam BETWEEN '$tgl1' AND '$tgl2' and a.id_distribusi = '1'");
+        $majo_gojek = DB::selectOne("SELECT SUM(a.bayar) AS bayar_majo
+        FROM tb_invoice AS a
+        WHERE a.tgl_jam BETWEEN '$tgl1' AND '$tgl2' and a.id_distribusi = '2'");
+
         $data = [
             'title'    => 'Summary',
             'tgl1' => $tgl1,
             'tgl2' => $tgl2,
-            'transaksi' => DB::selectOne("SELECT COUNT(a.no_order) AS ttl_invoice, SUM(a.discount) as discount, SUM(a.voucher) as voucher, sum(a.round) as rounding, a.id_lokasi, 
+            'majo' => $majo,
+            'majo_gojek' => $majo_gojek,
+            'transaksi' => DB::selectOne("SELECT COUNT(a.no_order) AS ttl_invoice, SUM(a.discount) as discount, SUM(a.voucher) as voucher, sum(a.round) as rounding, a.id_lokasi,
             SUM(a.total_orderan) AS rp, d.unit, a.no_order, sum(a.dp) as dp, sum(a.gosen) as gosend, sum(a.service) as ser, sum(a.tax) as tax,f.qty_void, f.void,
             SUM(a.cash) as cash, SUM(a.d_bca) as d_bca, SUM(a.k_bca) as k_bca, SUM(a.d_mandiri) as d_mandiri, SUM(a.k_mandiri) as k_mandiri, SUM(total_bayar) as total_bayar
-            
+
             FROM tb_transaksi AS a
-            
+
             LEFT JOIN(
             SELECT SUM(b.qty) AS unit , b.no_order, b.id_lokasi
             FROM tb_order AS b
             WHERE b.tgl BETWEEN '$tgl1' AND '$tgl2' AND b.id_lokasi = '$loc' AND b.void = 0
             GROUP BY b.id_lokasi
             )AS d ON d.id_lokasi = a.id_lokasi
-            
+
             LEFT JOIN(
             SELECT SUM(e.void) AS void , COUNT(e.void) AS qty_void, e.no_order, e.id_lokasi
             FROM tb_order AS e
             WHERE e.tgl BETWEEN '$tgl1' AND '$tgl2' AND e.id_lokasi = '$loc' AND e.void != '0'
             GROUP BY e.id_lokasi
             )AS f ON f.id_lokasi = a.id_lokasi
-            
-            
+
+
             where a.tgl_transaksi BETWEEN '$tgl1' AND '$tgl2' and a.id_lokasi = '$loc'
             GROUP BY a.id_lokasi"),
 
             'kategori' => DB::select("SELECT b.nm_menu, c.kategori , sum(e.harga2) as harga, sum(a.qty) AS qty
-FROM tb_order AS a 
-LEFT JOIN view_menu2 AS b ON b.id_harga = a.id_harga
-left join tb_kategori as c on c.kd_kategori = b.id_kategori
+            FROM tb_order AS a
+            LEFT JOIN view_menu2 AS b ON b.id_harga = a.id_harga
+            left join tb_kategori as c on c.kd_kategori = b.id_kategori
 
-left join(select d.id_harga, d.id_order, (d.harga * d.qty) as harga2 from tb_order as d 
+left join(select d.id_harga, d.id_order, (d.harga * d.qty) as harga2 from tb_order as d
 WHERE d.tgl BETWEEN '$tgl1' AND '$tgl2' and d.id_lokasi = '$loc' and d.id_distribusi = '1'
-group by d.id_order) as e on e.id_order = a.id_order           
-           
-WHERE a.tgl BETWEEN '$tgl1' AND '$tgl2' and a.id_lokasi = '$loc' and a.id_distribusi = '1' 
+group by d.id_order) as e on e.id_order = a.id_order
+
+WHERE a.tgl BETWEEN '$tgl1' AND '$tgl2' and a.id_lokasi = '$loc' and a.id_distribusi = '1'
  GROUP BY b.id_kategori"),
 
             'gojek' => DB::select("SELECT b.nm_menu, c.kategori, sum(e.harga2) as harga, sum(a.qty) AS qty
-            FROM tb_order AS a 
+            FROM tb_order AS a
             LEFT JOIN view_menu2 AS b ON b.id_harga = a.id_harga
             left join tb_kategori as c on c.kd_kategori = b.id_kategori
-            left join(select d.id_harga, d.id_order, (d.harga * d.qty) as harga2 from tb_order as d 
+            left join(select d.id_harga, d.id_order, (d.harga * d.qty) as harga2 from tb_order as d
 WHERE d.tgl BETWEEN '$tgl1' AND '$tgl2' and d.id_lokasi = '$loc' and d.id_distribusi = '2'
-group by d.id_order) as e on e.id_order = a.id_order  
+group by d.id_order) as e on e.id_order = a.id_order
             WHERE a.tgl BETWEEN '$tgl1' AND '$tgl2' and a.id_lokasi = '$loc' and a.id_distribusi = '2'
             GROUP BY b.id_kategori"),
 
@@ -99,6 +108,11 @@ group by d.id_order) as e on e.id_order = a.id_order
             'jml_telat' => $jml_telat,
             'lokasi' => $loc,
             'jml_ontime' => $jml_ontime,
+            'void' => DB::select("SELECT c.kategori,b.nm_menu,sum(a.void) as void, sum(a.harga) as harga FROM `tb_order` as a
+            LEFT JOIN view_menu2 as b on a.id_harga = b.id_harga
+            left join tb_kategori as c on b.id_kategori = c.kd_kategori
+            WHERE a.tgl BETWEEN '$tgl1' AND '$tgl2' AND a.void = 1 AND id_lokasi = '$loc'
+            GROUP BY c.kd_kategori"),
         ];
         return view('laporan.summary', $data);
     }
@@ -115,7 +129,7 @@ group by d.id_order) as e on e.id_order = a.id_order
             'tgl2' => $tgl2,
 
             'kategori' => DB::select("SELECT b.nm_menu, a.harga, sum(a.qty) AS qty
-            FROM tb_order AS a 
+            FROM tb_order AS a
             LEFT JOIN view_menu AS b ON b.id_harga = a.id_harga
             WHERE a.tgl BETWEEN '$tgl1' AND '$tgl2' and a.id_lokasi = '$loc'
             GROUP BY a.id_harga")
@@ -130,7 +144,7 @@ group by d.id_order) as e on e.id_order = a.id_order
         $tgl2 = $request->tgl2;
 
         $dt_item = DB::select("SELECT b.nm_menu, a.harga, sum(a.qty) AS qty
-        FROM tb_order AS a 
+        FROM tb_order AS a
         LEFT JOIN view_menu AS b ON b.id_harga = a.id_harga
         WHERE a.tgl BETWEEN '$tgl1' AND '$tgl2' and a.id_lokasi = '$loc'
         GROUP BY a.id_harga");
@@ -211,18 +225,18 @@ group by d.id_order) as e on e.id_order = a.id_order
         $tgl2 = $request->tgl2;
 
         $server = DB::select("SELECT a.nama, b.komisi,sum(d.qty_m) AS M, sum(d.qty_e) AS E, sum(d.qty_sp) AS Sp
-        FROM tb_karyawan AS a 
+        FROM tb_karyawan AS a
 
         LEFT JOIN (
         SELECT c.id_karyawan,  c.status,
         if(c.status = 'M', COUNT(c.status), 0) AS qty_m,
         if(c.status = 'E', COUNT(c.status), 0) AS qty_e,
         if(c.status = 'SP', COUNT(c.status), 0) AS qty_sp
-        FROM tb_absen AS c 
-        WHERE c.tgl BETWEEN '$tgl1' AND '$tgl2'
+        FROM tb_absen AS c
+        WHERE c.tgl BETWEEN '$tgl1' AND '$tgl2' and c.id_lokasi = 2
         GROUP BY c.id_karyawan, c.status
         ) AS d ON d.id_karyawan = a.id_karyawan
-        
+
         LEFT JOIN (
             SELECT a.admin, SUM(if(a.hrg - a.voucher < 0 ,0, a.hrg - a.voucher)) AS komisi
             FROM view_summary_server AS a

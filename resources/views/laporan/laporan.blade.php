@@ -54,8 +54,8 @@
                                         <select name="" id="kategori" class="form-control select2bs4">
                                             <option value="1">SUMMARY</option>
                                             <option value="2">PER-ITEM</option>
-                                            <!-- <option value="3">PENJUALAN SERVER</option>
-                                            <option value="4">JAM MASAK DAPUR</option> -->
+                                            <option value="3">PENJUALAN SERVER</option>
+                                            <!-- <option value="4">JAM MASAK DAPUR</option> -->
                                         </select>
                                     </div>
 
@@ -81,7 +81,7 @@
                     </div>
 
                 </div>
-                
+
             </div>
             <!-- /.row -->
         </div><!-- /.container-fluid -->
@@ -170,7 +170,7 @@
                     $('#data-laporan').hide();
                     $('#data-item').hide();
                     $('#data-masak').hide();
-                } 
+                }
 
             });
 

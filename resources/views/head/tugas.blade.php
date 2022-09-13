@@ -40,7 +40,7 @@
                     LEFT JOIN tb_meja AS c ON c.id_meja = a.id_meja where a.id_lokasi = '$lokasi' and a.id_meja = '$m->id_meja' and a.selesai = 'dimasak' and aktif = '1' and void = 0 ORDER BY a.id_order",
         ); ?>
         <?php $menu2 = DB::select(
-            "SELECT b.nm_menu, c.nm_meja, a.*,e.ttlMenu,f.ttlMenuSemua FROM tb_order AS a 
+            "SELECT b.nm_menu, c.nm_meja, a.*,e.ttlMenu,f.ttlMenuSemua FROM tb_order AS a
                     LEFT JOIN view_menu AS b ON b.id_harga = a.id_harga
                     LEFT JOIN (SELECT d.id_harga, COUNT(id_harga) as ttlMenu FROM `tb_order` as d where d.id_lokasi = '$lokasi' and d.id_meja = '$m->id_meja' and d.selesai != 'dimasak' and aktif = '1' and void = 0 GROUP BY d.id_harga) as e on b.id_harga = e.id_harga
                     LEFT JOIN (SELECT d.id_harga, COUNT(id_harga) as ttlMenuSemua FROM `tb_order` as d where d.id_lokasi = '$lokasi' and d.selesai != 'dimasak' and aktif = '1' and void = 0 GROUP BY d.id_harga) as f on b.id_harga = f.id_harga
@@ -78,7 +78,7 @@
             <?php endif ?>
         </tr>
         <?php endforeach ?>
-        <?php foreach ($menu as $m) : ?>
+        <?php foreach ($menu as $m) : if($m->nm_menu == '') {continue;} ?>
         <tr class="header">
             <td></td>
             <td style="white-space:nowrap;text-transform: lowercase;"><?= $m->nm_menu ?> <span class="text-danger">({{$m->ttlMenuSemua}})</span></td>

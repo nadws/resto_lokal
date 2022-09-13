@@ -31,6 +31,8 @@ $ttl += $k->komisi
             <tbody>
                 <?php $i = 1;
                 foreach ($server as $k) : ?>
+                @if ($k->M == 0 && $k->E == 0 && $k->Sp == 0)
+                @else
                 <tr>
                     <td>
                         <?= $i++ ?>
@@ -59,6 +61,7 @@ $ttl += $k->komisi
                         <?= number_format($komisi,0) ?>
                     </td>
                 </tr>
+                @endif
                 <?php endforeach ?>
             </tbody>
 

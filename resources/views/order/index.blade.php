@@ -74,6 +74,148 @@
             background: -webkit-linear-gradient(to right, #11998e, #26C784);
             background: linear-gradient(to right, #11998e, #26C784);
         }
+        .wrap-num-product {
+        width: 140px;
+
+        border-radius: 3px;
+        overflow: hidden;
+    }
+
+    .btn-num-product-up,
+    .btn-num-product-down {
+        width: 0px;
+        height: 100%;
+        cursor: pointer;
+    }
+
+
+
+    .num-product {
+        width: calc(100% - 90px);
+        height: 100%;
+        border-left: 1px solid #e6e6e6;
+        border-right: 1px solid #e6e6e6;
+        background-color: #f7f7f7;
+    }
+
+    input.num-product {
+        -moz-appearance: textfield;
+        appearance: none;
+        -webkit-appearance: none;
+    }
+
+    input.num-product::-webkit-outer-spin-button,
+    input.num-product::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+    }
+
+    .tes {
+        text-align: center;
+        font-size: 20px;
+        font-weight: bold;
+    }
+
+    element.style {}
+
+    label:not(.form-check-label):not(.custom-file-label) {
+        font-weight: 700;
+    }
+
+    .buying-selling.active {
+        background-image: linear-gradient(to right, #00B7B5 0%, #00B7B5 19%, #019392 60%, #04817F 100%);
+    }
+
+    .option1 {
+        display: none;
+    }
+
+    .buying-selling {
+        width: 123px;
+        padding: 10px;
+        position: relative;
+    }
+
+    .buying-selling-word {
+        font-size: 10px;
+        font-weight: 600;
+        margin-left: 35px;
+    }
+
+    .radio-dot:before,
+    .radio-dot:after {
+        content: "";
+        display: block;
+        position: absolute;
+        background: #fff;
+        border-radius: 100%;
+    }
+
+    .radio-dot:before {
+        width: 20px;
+        height: 20px;
+        border: 1px solid #ccc;
+        top: 10px;
+        left: 16px;
+    }
+
+    .radio-dot:after {
+        width: 12px;
+        height: 12px;
+        border-radius: 100%;
+        top: 14px;
+        left: 20px;
+    }
+
+    .buying-selling.active .buying-selling-word {
+        color: #fff;
+    }
+
+    .buying-selling.active .radio-dot:after {
+        background-image: linear-gradient(to right, #00B7B5 0%, #00B7B5 19%, #019392 60%, #04817F 100%);
+    }
+
+    .buying-selling.active .radio-dot:before {
+        background: #fff;
+        border-color: #699D17;
+    }
+
+    .buying-selling:hover .radio-dot:before {
+        border-color: #adadad;
+    }
+
+    .buying-selling.active:hover .radio-dot:before {
+        border-color: #699D17;
+    }
+
+
+    /* .buying-selling.active .radio-dot:after {
+					background-image: linear-gradient(to right, #f78ca0 0%, #f9748f 19%, #fd868c 60%, #fe9a8b 100%);
+				} */
+
+    /* dot */
+    .buying-selling:hover .radio-dot:after {
+        background-image: linear-gradient(to right, #00B7B5 0%, #00B7B5 19%, #019392 60%, #04817F 100%);
+    }
+
+    /* .buying-selling.active:hover .radio-dot:after {
+					background-image: linear-gradient(to right, #f78ca0 0%, #f9748f 19%, #fd868c 60%, #fe9a8b 100%);
+
+				} */
+
+    @media (max-width: 400px) {
+
+        .mobile-br {
+            display: none;
+        }
+
+        .buying-selling {
+            width: 49%;
+            padding: 10px;
+            position: relative;
+        }
+
+    }
 
     </style>
     <div class="content-wrapper">
@@ -121,6 +263,11 @@
                                             role="tab" aria-controls="pills-home" aria-selected="true"><i
                                                 class="fa fa-search"></i></a>
                                     </li>
+                                    <li class="nav-item">
+                                        <a class="nav-link majoo" id_dis="{{$id}}" id="pills-profile-tab" data-toggle="pill"
+                                            href="#majoo" role="tab" aria-controls="pills-profile"
+                                            aria-selected="false"><strong>STK</strong></a>
+                                    </li>
                                     @foreach ($kategori as $k)
                                         <li class="nav-item">
                                             <a class="nav-link" id="pills-profile-tab" data-toggle="pill"
@@ -166,7 +313,7 @@
                                 foreach ($sold_out as $s) {
                                     $id_menu_sold_out[] = $s->id_menu;
                                 }
-                                
+
                                 $idl = [];
                                 $limit = DB::select("SELECT tb_menu.id_menu as id_menu FROM tb_menu
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         LEFT JOIN(SELECT SUM(qty) as jml_jual, tb_harga.id_menu FROM tb_order LEFT JOIN tb_harga ON tb_order.id_harga = tb_harga.id_harga WHERE tb_order.id_lokasi = $id_lokasi AND tb_order.tgl = '$tgl' AND tb_order.void = 0 GROUP BY tb_harga.id_menu) dt_order ON tb_menu.id_menu = dt_order.id_menu
@@ -217,6 +364,26 @@
                                     </div>
                                 </div>
                             @endforeach
+                            <div class="tab-pane fade" id="majoo" role="tabpanel" aria-labelledby="pills-profile-tab">
+                                <div class="col-lg-12">
+                                    <div class="card">
+                                        <div class="card-body">
+                                            <input type="text" name="search_text" id_dis="{{$id}}" id="search_majoo"
+                                                class="form-control" placeholder="Cari Menu . . ." />
+                                        </div>
+                                    </div>
+                                </div>
+                                <div id="id_majoo">
+                                    <div id="produk_majo">
+
+                                    </div>
+                                    <div id="result_majo">
+
+                                    </div>
+
+                                </div>
+
+                            </div>
                         </div>
                     </div>
                     <div class="col-md-5">
@@ -329,6 +496,42 @@
             aria-hidden="true">
             <div class="modal-dialog modal-sm" role="document">
                 <div id="harga"></div>
+            </div>
+        </div>
+        </div>
+    </form>
+    <form method="get" class="input_cart_majo">
+        <div class="modal fade modal-cart" id="modal_majo" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg" role="document">
+                <div class="modal-content">
+
+                    <!-- Modal Header -->
+                    <div class="modal-header bg-info">
+                        <h5 class="modal-title majoo">Detail Produk</h5>
+
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">&times;</span>
+                        </button>
+                    </div>
+                    <!-- Modal body -->
+                    <div class="modal-body">
+
+                        <div id="harga_majoo">
+
+                        </div>
+                        <hr>
+                        <h5 style="font-size: 1rem;">DIJUAL OLEH</h5>
+
+                        <div class="buying-selling-group" id="buying-selling-group" data-toggle="buttons">
+
+
+                        </div>
+
+                        <button type="submit" class="btn float-right  btn-costume"> SIMPAN</button>
+
+                    </div>
+                </div>
             </div>
         </div>
         </div>
@@ -526,7 +729,7 @@
                         qty: qty
                     },
                     success: function(data) {
-                        // $('#cart_session').html(data); 
+                        // $('#cart_session').html(data);
                         load_cart();
                     }
                 });
@@ -544,7 +747,7 @@
                         qty: qty
                     },
                     success: function(data) {
-                        // $('#cart_session').html(data); 
+                        // $('#cart_session').html(data);
                         load_cart();
                     }
                 });
@@ -563,6 +766,148 @@
                     }
                 });
             }
+        });
+    </script>
+    <script>
+        $(document).ready(function() {
+            var dis = $("#dis").val();
+
+            $(document).on('click', '.majoo', function(event) {
+                var id_dis = $(this).attr("id_dis");
+                var url = "{{ route('get_majo') }}?id_dis=" + id_dis
+                $('#produk_majo').load(url);
+            });
+
+            $('#search_majoo').keyup(function() {
+                var keyword = $("#search_majoo").val();
+                if (keyword != '') {
+                    $('#result_majo').show();
+                    $('#produk_majo').hide();
+                    load_majo(keyword);
+                } else {
+                    $('#result_majo').hide();
+                    $('#produk_majo').show();
+                }
+
+            });
+            function load_majo(keyword) {
+                    $.ajax({
+                        method: "GET",
+                        url: "{{ route('search_majo') }}",
+                        data: {
+                            keyword: keyword,
+                            dis: dis
+
+                        },
+                        success: function(hasil) {
+                            $('#result_majo').html(hasil);
+                        }
+                    });
+                }
+            $(document).on('click', '.stok_habis', function(event) {
+                Swal.fire({
+                  toast: true,
+                  position: 'top-end',
+                  showConfirmButton: false,
+                  timer: 3000,
+                  icon: 'error',
+                  title: ' Stok habis'
+                });
+            });
+
+            $(document).on('click', '.input_cart3', function() {
+                    var id_produk = $(this).attr("id_produk");
+
+
+                    // console.log(id_harga);
+                    $.ajax({
+                        url: "{{ route('item_menu_majoo') }}",
+                        method: "GET",
+                        data: {
+                            id_produk: id_produk,
+                        },
+                        success: function(data) {
+                            $('#harga_majoo').html(data);
+                            // alert(data);
+                        }
+                    });
+
+                    $.ajax({
+                        url: "{{route('get_karyawan_majo')}}",
+                        method: "GET",
+                        success: function(data) {
+                        $('.buying-selling-group').html(data);
+
+                    }
+                });
+
+            });
+
+            load_cart();
+
+                function load_cart() {
+                    var dis2 = $("#dis2").val();
+                    $.ajax({
+                        method: "GET",
+                        url: "{{ route('keranjang') }}?dis=" + dis2,
+                        success: function(hasil) {
+                            $('#keranjang').html(hasil);
+                        }
+                    });
+                }
+
+
+
+            $(document).on('submit', '.input_cart_majo', function(event) {
+              event.preventDefault();
+              var id = $("#cart_id").val();
+              var jumlah = $("#cart_jumlah").val();
+              var satuan = $("#cart_satuan").val();
+              var catatan = $("#cart_catatan").val();
+                //   var kd_karyawan = $('.cart_id_karyawan').val();
+                var kode = []
+              var kd_karyawan = $('input[name^="kd_karyawan"]:checked').each(function() {
+                    kode.push($(this).val())
+
+                });
+              $.ajax({
+                url: "{{route('cart_majoo')}}",
+                method: 'get',
+                data:{
+                    id : id,
+                    jumlah : jumlah,
+                    satuan : satuan,
+                    catatan : catatan,
+                    kd_karyawan : kode,
+                },
+                success: function(data) {
+                  if (data == 'kosong') {
+                    Swal.fire({
+                      toast: true,
+                      position: 'top-end',
+                      showConfirmButton: false,
+                      timer: 3000,
+                      icon: 'error',
+                      title: 'Stok tidak cukup'
+                    });
+                  }else if (data == 'null'){
+                    Swal.fire({
+                      toast: true,
+                      position: 'top-end',
+                      showConfirmButton: false,
+                      timer: 3000,
+                      icon: 'error',
+                      title: 'Data penjual belum diisi'
+                    });
+                  }else{
+                    $('#cart_session').html(data);
+                    $('.modal-cart').modal('hide');
+                    load_cart();
+                  }
+
+                }
+              });
+            });
         });
     </script>
 @endsection

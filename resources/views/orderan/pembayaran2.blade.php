@@ -67,6 +67,9 @@
                                             $total2 += $o->qty_produk * $o->harga;
                                         ?>
                                         <tr>
+                                            @if ($o->nm_menu == '')
+
+                                        @else
                                             <td>
                                                 <?= $i++ ?>
                                             </td>
@@ -87,12 +90,42 @@
                                             </td>
                                             <td></td>
                                         </tr>
+                                        @endif
+                                        <?php endforeach ?>
+                                        <?php
+                                        $total_majo = 0;
+                                        $harga_majo = 0;
+                                        foreach($majo as $m):
+                                        $total_majo += $m->jumlah * $m->harga;
+                                        $harga_majo += $m->harga;
+                                        ?>
+                                        <tr>
+                                            <td>
+                                                <?= $i++ ?>
+                                            </td>
+                                            <td>
+                                                <?= $m->nm_meja ?>
+                                            </td>
+                                            <td>
+                                                <?= $m->nm_produk ?>
+                                            </td>
+                                            <td>
+                                                <?= $m->jumlah ?>
+                                            </td>
+                                            <td>
+                                                <?= number_format($m->harga, 0) ?>
+                                            </td>
+                                            <td>
+                                                <?= number_format($m->jumlah * $m->harga, 0) ?>
+                                            </td>
+                                            <td></td>
+                                        </tr>
                                         <?php endforeach ?>
                                     </tbody>
                                     <?php $tb_dis = DB::table('tb_distribusi')
                                             ->where('id_distribusi', $dis)
                                             ->first();
-                                        
+
                                         ?>
 
 
@@ -113,10 +146,28 @@
                                                 <?= $qty ?>
                                             </td>
                                             <td>
-                                                <?= number_format($harga, 0) ?>
+                                                <?= number_format($harga + $harga_majo, 0) ?>
                                             </td>
                                             <td>
-                                                <?= number_format($total2, 0) ?>
+                                                <?= number_format($total2 + $total_majo, 0) ?>
+                                            </td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Discount</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>-</td>
+                                            <td width="20%"><?= number_format($transaksi->discount, 0) ?> %</td>
+                                            <td></td>
+                                        </tr>
+                                        <tr>
+                                            <td colspan="2">Voucher</td>
+                                            <td></td>
+                                            <td></td>
+                                            <td>-</td>
+                                            <td width="20%">
+                                                <?= number_format($transaksi->voucher, 0) ?>
                                             </td>
                                             <td></td>
                                         </tr>
@@ -168,28 +219,16 @@
                                             </td>
                                             <td width="20%" style="background-color: #C8E1F3;font-weight: bold;"></td>
                                             <td width="20%" style="background-color: #C8E1F3;font-weight: bold;">
-                                                <?= number_format($total2 + $transaksi->service + $transaksi->tax + $transaksi->ongkir, 0) ?>
+                                                {{-- @php
+                                                    $totO = $total2 * (100 - $transaksi->discount) / 100 - $transaksi->voucher;
+                                                    $to = $totO + $transaksi->service + $transaksi->tax + $transaksi->ongkir + $transaksi->round;
+                                                @endphp
+                                                <?= number_format($to < 1 ? 0 : $to, 0) ?> --}}
+                                                <?= number_format($transaksi->total_bayar, 0) ?>
                                             </td>
                                             <td style="background-color: #C8E1F3;font-weight: bold;"></td>
                                         </tr>
-                                        <tr>
-                                            <td colspan="2">Discount</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>-</td>
-                                            <td width="20%">0</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td colspan="2">Voucher</td>
-                                            <td></td>
-                                            <td></td>
-                                            <td>-</td>
-                                            <td width="20%">
-                                                <?= number_format($transaksi->voucher, 0) ?>
-                                            </td>
-                                            <td></td>
-                                        </tr>
+
                                         <tr>
                                             <td colspan="2">Dp</td>
                                             <td></td>
@@ -305,7 +344,11 @@
                                             <td style="background-color: #BCF9BC;"></td>
                                             <td style="background-color: #BCF9BC;">-</td>
                                             <td style="background-color: #BCF9BC;" width="20%">
+                                                @if ($transaksi->kembalian > 0)
+                                                <?= number_format($transaksi->kembalian, 0) ?>
+                                                @else
                                                 <?= number_format($transaksi->cash + $transaksi->d_bca + $transaksi->k_bca + $transaksi->d_mandiri + $transaksi->k_mandiri - $transaksi->total_bayar, 0) ?>
+                                                @endif
                                             </td>
                                             <td style="background-color: #BCF9BC;"> <a class="btn btn-sm btn-primary"
                                                     href="<?= route('print_nota', ['no' => $no]) ?>" target="_blank"><i
@@ -377,7 +420,7 @@
                                     title: 'Kode voucher tidak ditemukan'
                                 });
 
-                            } 
+                            }
                             else {
                                 $('#rupiah').val(data);
                                 var ttl = ttl2 - data - view_dp + parseFloat(gosen);

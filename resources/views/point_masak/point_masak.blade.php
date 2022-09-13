@@ -1,6 +1,6 @@
 @extends('template.master')
 @section('content')
-<?php $l = 1; 
+<?php $l = 1;
 $point = 0;
 $point2 = 0;
 foreach ($masak as $k) : ?>
@@ -9,7 +9,6 @@ foreach ($masak as $k) : ?>
 
 
 <?php  endforeach ?>
-
 
 
 
@@ -50,12 +49,12 @@ foreach ($masak as $k) : ?>
                                 <?= number_format($orang,0) ?>
                             </h5>
                             <h5>
-                                Service charge dibagi : 
+                                Service charge dibagi :
                                 <?= number_format(($service_charge / 7) * $persen->jumlah_persen,0) ?>
                             </h5>
                             @if($jumlah_orang->jumlah < $orang)
                             @else
-                            <h5>Service charge real :              
+                            <h5>Service charge real :
                                 <?= number_format($kom,0) ?>
                             </h5>
                             @endif
@@ -94,6 +93,8 @@ foreach ($masak as $k) : ?>
 
                                 <tbody>
                                     <?php $i = 1; foreach ($masak as $k) : ?>
+                                    @if($k->point_berhasil == '')
+                                    @else
                                     <tr>
                                         <td>
                                             <?= $i++ ?>
@@ -104,16 +105,18 @@ foreach ($masak as $k) : ?>
                                         <?php $kom1 = $point == '' ? '0' :  ($k->point_berhasil / $point) * $kom  ?>
 
                                         <td style="text-align: right">
-                                            <?= number_format($k->point_berhasil,1) ?> 
+                                            <?= number_format($k->point_berhasil,1) ?>
                                             <?= $jumlah_orang->jumlah < $orang ? '' : '/' . number_format($kom1,0) ?>
                                         </td>
                                         <?php $kom3 =  $point == '' ? '0' : ($k->point_gagal / $point) * $kom  ?>
 
                                         <td style="text-align: right">
-                                            <?= number_format($k->point_gagal,0) ?> 
+                                            <?= number_format($k->point_gagal,0) ?>
                                             <?= $jumlah_orang->jumlah < $orang ? '' : '/' . number_format($kom3,0) ?>
                                         </td>
                                     </tr>
+                                    @endif
+
                                     <?php endforeach ?>
                                 </tbody>
 

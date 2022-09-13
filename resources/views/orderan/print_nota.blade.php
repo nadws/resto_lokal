@@ -29,8 +29,8 @@
             </td>
             <td>
 
-                Pax<br><br>
-                <?= $pesan_2[0]->orang ?>
+                <!-- Pax<br><br>
+                <?= $pesan_2[0]->orang ?> -->
             </td>
 
             <td style="text-align: right;">
@@ -53,6 +53,9 @@
             $harga += $d->harga;
             $dis = $d->id_distribusi;
         ?>
+            @if ($d->nm_menu == '')
+            @else
+
             <tr>
                 <td style="text-align: left;" width="6%">
                     <?= $d->qty_produk ?>
@@ -68,7 +71,31 @@
                     <?= $d->selisih . ' / ' . $d->selisih2 ?>
                 </td>
             </tr>
+            @endif
         <?php endforeach ?>
+
+        <?php
+        $s_total_majo = 0;
+        foreach ($majo as $m):
+        $s_total_majo += $m->harga * $m->jumlah;
+        ?>
+        <tr>
+            <td style="text-align: left;" width="6%">
+                <?= $m->jumlah ?>
+            </td>
+            <td style="font-size: 20px;">
+                <?= ucwords(strtolower($m->nm_produk)) ?>
+            </td>
+            <td width="23%" style="font-size: 20px;">
+                <?= number_format($m->harga * $m->jumlah) ?>
+            </td>
+
+            <td width="15%" align="right" style="white-space: nowrap;">
+
+            </td>
+        </tr>
+        <?php endforeach ?>
+
         <?php $tb_dis = DB::table('tb_distribusi')
             ->where('id_distribusi', $dis)
             ->first(); ?>
@@ -86,13 +113,28 @@
                 <span style="font-weight: bold;"> SUBTOTAL </span>
             </td>
             <td style="font-weight: bold; font-size: 20px; " width="8%">
-                <?= number_format($s_total) ?>
+                <?= number_format($s_total + $s_total_majo) ?>
             </td>
 
             <td width="15%" align="right">
 
             </td>
         </tr>
+        <?php if ($transaksi->discount) : ?>
+            <tr>
+                <td style="text-align: left;" width="6%"></td>
+                <td style="font-size: 20px;">
+                    Discount
+                </td>
+                <td width="22%" style="font-size: 20px;">
+                    <?= number_format($transaksi->discount) ?> %
+                </td>
+
+                <td width="15%" align="right">
+
+                </td>
+            </tr>
+        <?php endif; ?>
         <?php if ($transaksi->voucher) : ?>
             <tr>
                 <td style="text-align: left;" width="6%"></td>
@@ -108,17 +150,19 @@
                 </td>
             </tr>
         <?php endif; ?>
-
+        @php
+            $totO = ($s_total + $s_total_majo) * (100 - $transaksi->discount) / 100 - $transaksi->voucher
+        @endphp
         <tr>
             <td style="text-align: left;" width="6%"></td>
             <td style="font-size: 20px;">
                 <span style="font-weight: bold;"> DISC VOUCHER </span>
             </td>
             <td width="22%" style="font-size: 20px;">
-                <?php if ($s_total - $transaksi->voucher < 0) : ?>
+                <?php if ($totO < 0) : ?>
                     <span style="font-weight: bold;">0</span>
                 <?php else : ?>
-                    <span style="font-weight: bold;"><?= number_format($s_total - $transaksi->voucher) ?></span>
+                    <span style="font-weight: bold;"><?= number_format($totO) ?></span>
                 <?php endif ?>
 
             </td>
@@ -186,9 +230,7 @@
             <td style="font-weight: bold; font-size: 20px;" width="22%">
                 <?= number_format($totalan) ?>
             </td>
-
             <td width="15%" align="right">
-
             </td>
         </tr> --}}
         <!-- <tr>
@@ -199,9 +241,7 @@
             <td width="22%" style="font-size: 20px;">
                 0
             </td>
-
             <td width="15%" align="right">
-
             </td>
         </tr> -->
 
@@ -327,7 +367,11 @@
                 Change
             </td>
             <td width="22%">
+                @if ($transaksi->kembalian > 0)
+                <?= number_format($transaksi->kembalian, 0) ?>
+                @else
                 <?= number_format($transaksi->cash + $transaksi->d_bca + $transaksi->k_bca + $transaksi->d_mandiri + $transaksi->k_mandiri - $transaksi->total_bayar, 0) ?>
+                @endif
             </td>
 
             <td width="15%" align="right" style="font-size: 20px;">

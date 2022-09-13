@@ -158,15 +158,61 @@
         .modal-lg-max {
             max-width: 900px;
         }
+        .modal-lg-max2 {
+            max-width: 1200px;
+        }
 
     </style>
+
+<form>
+    <div class="modal fade" id="summary" role="dialog"
+        aria-labelledby="exampleModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-lg-max2" role="document">
+            <div class="modal-content ">
+                <div class="modal-header btn-costume">
+                    <h5 class="modal-title text-light" id="exampleModalLabel">View 1 Jam Terakhir</h5>
+                    <button type="button" class="close text-light" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                   <div id="badan"></div>
+
+                </div>
+
+            </div>
+        </div>
+    </div>
+</form>
 @endsection
 @section('script')
     <script src="{{ asset('assets') }}plugins/jquery/jquery.min.js"></script>
     <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script>
         $(document).ready(function() {
+            function loadSearch(s){
+                $.ajax({
+                    type: "GET",
+                    url: "{{route('getSearchHead')}}?s="+s,
+                    success: function (data) {
+                        // $("#tugas_head").hide()
+                        // $("#searchTugas").show()
+                       $("#tugas_head").html(data)
+                    }
+                });
 
+            }
+            $(document).on('click', '#btnSearch', function(e){
+                e.preventDefault()
+                var s = $("#searchHead").val()
+
+                if(s == '') {
+                    load_tugas();
+                } else {
+                    loadSearch(s)
+                }
+            })
+            $("#tugas_head").show()
             load_tugas();
 
             function load_tugas() {
@@ -185,7 +231,7 @@
             $(document).on('click', '.koki1', function(event) {
                 var kode = $(this).attr('kode');
                 var kry = $(this).attr('kry');
-
+                var s = $("#searchHead").val()
                 $.ajax({
                     type: "POST",
                     url: "<?= route('koki1') ?>",
@@ -205,7 +251,11 @@
                         });
                         // var audio = document.getElementById("audio");
                         // audio.play();
-                        load_tugas();
+                        if(s == '') {
+                            load_tugas();
+                        } else {
+                            loadSearch(s)
+                        }
                     }
                 });
             });
@@ -215,6 +265,7 @@
 
                 var kode = $(this).attr('kode');
                 var kry = $(this).attr('kry');
+                var s = $("#searchHead").val()
                 $.ajax({
                     type: "POST",
                     url: "<?= route('koki2') ?>",
@@ -232,7 +283,11 @@
                             icon: 'success',
                             title: 'Koki 2 berhasil ditambahkan'
                         });
-                        load_tugas();
+                        if(s == '') {
+                            load_tugas();
+                        } else {
+                            loadSearch(s)
+                        }
                     }
                 });
             });
@@ -240,6 +295,7 @@
             $(document).on('click', '.koki3', function(event) {
                 var kode = $(this).attr('kode');
                 var kry = $(this).attr('kry');
+                var s = $("#searchHead").val()
                 $.ajax({
                     type: "POST",
                     url: "<?= route('koki3') ?>",
@@ -257,13 +313,18 @@
                             icon: 'success',
                             title: 'Koki 3 berhasil ditambahkan'
                         });
-                        load_tugas();
+                        if(s == '') {
+                            load_tugas();
+                        } else {
+                            loadSearch(s)
+                        }
                     }
                 });
             });
 
             $(document).on('click', '.un_koki1', function(event) {
                 var kode = $(this).attr('kode');
+                var s = $("#searchHead").val()
                 $.ajax({
                     type: "POST",
                     url: "<?= route('un_koki1') ?>",
@@ -280,12 +341,17 @@
                             icon: 'success',
                             title: 'Koki 1 dibatalkan'
                         });
-                        load_tugas();
+                        if(s == '') {
+                            load_tugas();
+                        } else {
+                            loadSearch(s)
+                        }
                     }
                 });
             });
             $(document).on('click', '.un_koki2', function(event) {
                 var kode = $(this).attr('kode');
+                var s = $("#searchHead").val()
                 $.ajax({
                     type: "POST",
                     url: "<?= route('un_koki2') ?>",
@@ -302,12 +368,17 @@
                             icon: 'success',
                             title: 'Koki 2 dibatalkan'
                         });
-                        load_tugas();
+                        if(s == '') {
+                            load_tugas();
+                        } else {
+                            loadSearch(s)
+                        }
                     }
                 });
             });
             $(document).on('click', '.un_koki3', function(event) {
                 var kode = $(this).attr('kode');
+                var s = $("#searchHead").val()
                 $.ajax({
                     type: "POST",
                     url: "<?= route('un_koki3') ?>",
@@ -324,13 +395,17 @@
                             icon: 'success',
                             title: 'Koki 3 dibatalkan'
                         });
-                        load_tugas();
+                        if(s == '') {
+                            load_tugas();
+                        } else {
+                            loadSearch(s)
+                        }
                     }
                 });
             });
             $(document).on('click', '.selesai', function(event) {
                 var kode = $(this).attr('kode');
-
+                var s = $("#searchHead").val()
                 $.ajax({
                     type: "GET",
                     url: "<?= route('head_selesei') ?>?kode="+kode,
@@ -343,14 +418,18 @@
                             icon: 'success',
                             title: 'Makanan telah selesai'
                         });
-                        load_tugas();
+                        if(s == '') {
+                            load_tugas();
+                        } else {
+                            loadSearch(s)
+                        }
                     }
                 });
             });
 
             $(document).on('click', '.cancel', function(event) {
                 var kode = $(this).attr('kode');
-
+                var s = $("#searchHead").val()
                 $.ajax({
                     type: "GET",
                     url: "<?= route('head_cancel') ?>?kode="+kode,
@@ -363,13 +442,17 @@
                             icon: 'info',
                             title: 'Cancel orderan'
                         });
-                        load_tugas();
+                        if(s == '') {
+                            load_tugas();
+                        } else {
+                            loadSearch(s)
+                        }
                     }
                 });
             });
-            
-            $(document).on('click', '.gagal', function(event) {
 
+            $(document).on('click', '.gagal', function(event) {
+                var s = $("#searchHead").val()
                 Swal.fire({
                     toast: true,
                     position: 'top-end',
@@ -378,12 +461,28 @@
                     icon: 'error',
                     title: 'Koki belum di pilih'
                 });
-                load_tugas();
+                if(s == '') {
+                            load_tugas();
+                        } else {
+                            loadSearch(s)
+                        }
 
 
             });
 
-
+            function loadView1Jam() {
+                $("#badan").load("{{route('view1jam')}}", "data", function (response, status, request) {
+                    this; // dom element
+                        $('#tableJam').DataTable({
+                            "bSort": true,
+                            // "scrollX": true,
+                            "paging": true,
+                            "stateSave": true,
+                            "scrollCollapse": true
+                        });
+                });
+            }
+           loadView1Jam()
 
 
             load_distribusi();

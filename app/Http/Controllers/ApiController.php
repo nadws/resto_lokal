@@ -64,13 +64,13 @@ class ApiController extends Controller
                 'orang' => $t->orang,
                 'no_checker' => $t->no_checker,
                 'voucher' => $t->voucher,
-
             ]);
         }
 
+
         $response = Http::acceptJson()->post('https://ptagafood.com/api/tb_order', $data1);
 
-        // return $response;
+
         Orderan::whereIn('id_order', $id_order)->update(['import' => 'Y']);
         return redirect()->route('sukses')->with('sukses', 'Sukses');
     }
@@ -98,6 +98,29 @@ class ApiController extends Controller
     }
     public function tb_transaksi()
     {
+
+        $tb_invoice = DB::table('tb_invoice')->where('import', 'T')->get();
+        $id_invoice = [];
+        $data2 = [];
+        foreach ($tb_invoice as $t) {
+            $id_invoice[] = $t->id;
+            array_push($data2, [
+                'no_nota' => $t->no_nota,
+                'total' => $t->total,
+                'bayar' => $t->bayar,
+                'tgl_jam' => $t->tgl_jam,
+                'tgl_input' => $t->tgl_input,
+                'admin' => $t->admin,
+                'no_meja' => $t->no_meja,
+                'lokasi' => $t->lokasi,
+                'id_distribusi' => $t->id_distribusi,
+            ]);
+        }
+
+        $response = Http::acceptJson()->post('https://ptagafood.com/api/tb_invoice_new', $data2);
+        DB::table('tb_invoice')->whereIn('id', $id_invoice)->update(['import' => 'Y']);
+
+
         $tb_transaksi = Transaksi::where('import', 'T')->get();
 
         $id_transaksi = [];
@@ -123,17 +146,67 @@ class ApiController extends Controller
                 'k_mandiri' => $t->k_mandiri,
                 'ongkir' => $t->ongkir,
                 'service' => $t->service,
-                'tax' => $t->tax
+                'tax' => $t->tax,
+                'kembalian' => $t->kembalian,
             ]);
         }
         $response = Http::acceptJson()->post('https://ptagafood.com/api/tb_transaksi', $data1);
-
-
         Transaksi::whereIn('id_transaksi', $id_transaksi)->update(['import' => 'Y']);
+
+        // tb produk majo
+        $tb_produk = DB::table('tb_produk')->where([['import', 'T'], ['id_lokasi', 2]])->get();
+        $id_produk = [];
+        $datap = [];
+        foreach ($tb_produk as $t) {
+            $id_produk[] = $t->id_produk;
+            array_push($datap, [
+                'stok' => $t->stok,
+                'id_produk' => $t->id_produk,
+                'id_lokasi' => $t->id_lokasi,
+            ]);
+        }
+
+        $response = Http::acceptJson()->post('https://ptagafood.com/api/tb_produk_majo', $datap);
+        DB::table('tb_produk')->whereIn('id_produk', $id_produk)->update(['import' => 'Y']);
+
+        // tb invoice majoo
+
+
+        // tb pembelian majoo
+        $tb_pembelian = DB::table('tb_pembelian')->where('import', 'T')->get();
+        $id_pembelian = [];
+        $data3 = [];
+        foreach ($tb_pembelian as $t) {
+            $id_pembelian[] = $t->id_pembelian;
+            array_push($data3, [
+                'no_nota' => $t->no_nota,
+                'id_karyawan' => $t->id_karyawan,
+                'id_produk' => $t->id_produk,
+                'nm_karyawan' => $t->nm_karyawan,
+                'tanggal' => $t->tanggal,
+                'tgl_input' => $t->tgl_input,
+                'jumlah' => $t->jumlah,
+                'harga' => $t->harga,
+                'diskon' => $t->diskon,
+                'jml_komisi' => $t->jml_komisi,
+                'total' => $t->total,
+                'catatan' => $t->catatan,
+                'admin' => $t->admin,
+                'no_meja' => $t->no_meja,
+                'lokasi' => $t->lokasi,
+                'void' => $t->void,
+                'created_at' => $t->created_at,
+                'updated_at' => $t->updated_at,
+            ]);
+        }
+        // dd($data2);
+        $response = Http::acceptJson()->post('https://ptagafood.com/api/tb_pembelian_majo', $data3);
+        DB::table('tb_pembelian')->whereIn('id_pembelian', $id_pembelian)->update(['import' => 'Y']);
 
 
         return redirect()->route('sukses')->with('sukses', 'Sukses');
     }
+
 
     public function tb_order2()
     {
@@ -226,10 +299,10 @@ class ApiController extends Controller
         }
         $response =  Http::post('https://ptagafood.com/api/tb_driver', $data);
 
-        return $response;
+        // return $response;
         Ctt_driver::whereIn('id_driver', $id_driver)->update(['import' => 'Y']);
 
-        // return redirect()->route('sukses')->with('sukses', 'Sukses');
+        return redirect()->route('sukses')->with('sukses', 'Sukses');
     }
     public function tips(Request $request)
     {
@@ -297,7 +370,7 @@ class ApiController extends Controller
 
     public function tb_jurnal(Request $request)
     {
-        
+
         $data = Jurnal::where('import', 'T')->get();
 
         $id_jurnal = [];
@@ -322,6 +395,31 @@ class ApiController extends Controller
         }
 
         $response = Http::acceptJson()->post('https://ptagafood.com/api/tb_jurnal', $data1);
+
+
+        $dataDp = DB::table('tb_dp')->get();
+        $id_dp = [];
+        $data2 = [];
+        foreach ($dataDp as $t) {
+            $id_dp[] = $t->id_dp;
+            array_push($data2, [
+                'kd_dp' => $t->kd_dp,
+                'nm_customer' =>  $t->nm_customer,
+                'server' =>  $t->server,
+                'jumlah' =>  $t->jumlah,
+                'tgl' =>  $t->tgl,
+                'ket' =>  $t->ket,
+                'metode' =>  $t->metode,
+                'tgl_input' =>  $t->tgl_input,
+                'tgl_digunakan' =>  $t->tgl_digunakan,
+                'status' =>  $t->status,
+                'admin' => $t->admin,
+                'id_lokasi' =>  $t->id_lokasi,
+                'created_at' =>  $t->created_at,
+                'updated_at' =>  $t->updated_at,
+            ]);
+        }
+        $response = Http::acceptJson()->post('https://ptagafood.com/api/tb_dp', $data2);
 
         // return $response;
         Jurnal::whereIn('id_jurnal', $id_jurnal)->update(['import' => 'Y']);

@@ -46,7 +46,9 @@ use App\Http\Controllers\WelcomeController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Point_masak;
 use App\Http\Controllers\Kom_server;
-
+use App\Http\Controllers\ProdukController;
+use App\Http\Controllers\StokmasukController;
+use App\Http\Controllers\OpnamemajoController;
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -139,7 +141,7 @@ Route::post('/editMenuCheck', [MenuController::class, 'editMenuCheck'])->name('e
 Route::post('/plusDistribusi', [MenuController::class, 'plusDistribusi'])->name('plusDistribusi')->middleware('auth');
 Route::post('/importMenu', [MenuController::class, 'importMenu'])->name('importMenu')->middleware('auth');
 Route::get('/exportMenu', [MenuController::class, 'exportMenu'])->name('exportMenu')->middleware('auth');
-// -----------------------------------------------                
+// -----------------------------------------------
 
 Route::get('/karyawan', [KaryawanController::class, 'index'])->name('karyawan')->middleware('auth');
 Route::post('/addKaryawan', [KaryawanController::class, 'addKaryawan'])->name('addKaryawan')->middleware('auth');
@@ -221,7 +223,7 @@ Route::get('/deleteTips', [TipsController::class, 'deleteTips'])->name('deleteTi
 
 Route::get('/dp', [DpController::class, 'index'])->name('dp')->middleware('auth');
 Route::post('/addDp', [DpController::class, 'addDp'])->name('addDp')->middleware('auth');
-Route::get('/hapusDp', [DpController::class, 'hapusDp'])->name('hapusDp')->middleware('auth');
+Route::get('/delDp', [DpController::class, 'delDp'])->name('delDp')->middleware('auth');
 // --------------------------------------------------------------------------------------
 
 Route::get('/addKoki', [AddKokiController::class, 'index'])->name('addKoki')->middleware('auth');
@@ -325,6 +327,7 @@ Route::get('/all_checker', [OrderanController::class, 'all_checker'])->name('all
 
 // head ---------------------------------------------------------
 Route::get('/get_head', [HeadController::class, 'get_head'])->name('get_head');
+Route::get('/getSearchHead', [HeadController::class, 'getSearchHead'])->name('getSearchHead');
 Route::post('/koki1', [HeadController::class, 'koki1'])->name('koki1');
 Route::post('/koki2', [HeadController::class, 'koki2'])->name('koki2');
 Route::post('/koki3', [HeadController::class, 'koki3'])->name('koki3');
@@ -333,6 +336,7 @@ Route::post('/un_koki2', [HeadController::class, 'un_koki2'])->name('un_koki2');
 Route::post('/un_koki3', [HeadController::class, 'un_koki3'])->name('un_koki3');
 Route::get('/head_selesei', [HeadController::class, 'head_selesei'])->name('head_selesei');
 Route::get('/head_cancel', [HeadController::class, 'head_cancel'])->name('head_cancel');
+Route::get('/view1jam', [HeadController::class, 'view1jam'])->name('view1jam');
 Route::get('/distribusi3', [HeadController::class, 'distribusi'])->name('distribusi3');
 
 Route::post('/selesai_check', [HeadController::class, 'selesai_check'])->name('selesai_check');
@@ -360,6 +364,7 @@ Route::get('/tb_order2', [ApiController::class, 'tb_order2'])->name('tb_order2')
 Route::get('/tb_denda', [ApiController::class, 'tb_denda'])->name('tb_denda');
 Route::get('/tb_kasbon', [ApiController::class, 'tb_kasbon'])->name('tb_kasbon');
 Route::get('/tb_jurnal', [ApiController::class, 'tb_jurnal'])->name('tb_jurnal');
+Route::get('/tb_dp', [ApiController::class, 'tb_dp'])->name('tb_dp');
 Route::get('/tb_invoice_hapus', [ApiController::class, 'tb_invoice_hapus'])->name('tb_invoice_hapus');
 
 
@@ -389,3 +394,67 @@ Route::get('/point_export', [Point_masak::class, 'point_export'])->name('point_e
 Route::get('/kom_server', [Kom_server::class, 'index'])->name('kom_server');
 Route::get('/komisi_server', [Kom_server::class, 'komisi_server'])->name('komisi_server');
 // tambah sub navbar menu
+
+
+// MAJO
+
+Route::get('/get_majo', [OrderController::class, 'get_majo'])->name('get_majo');
+Route::get('/search_majo', [OrderController::class, 'cari_majo'])->name('search_majo');
+Route::get('/item_menu_majoo', [OrderController::class, 'get_harga_majoo'])->name('item_menu_majoo');
+Route::get('/get_karyawan_majo', [OrderController::class, 'get_karyawan'])->name('get_karyawan_majo');
+Route::get('/cart_majoo', [OrderController::class, 'cart_majoo'])->name('cart_majoo');
+
+
+//
+
+Route::post('/meja_selesai_majo', [MejaController::class, 'meja_selesai_majo'])->name('meja_selesai_majo');
+Route::post('/pilih_waitress_majo', [MejaController::class, 'pilih_waitress_majo'])->name('pilih_waitress_majo');
+Route::post('/un_waitress_majo', [MejaController::class, 'un_waitress_majo'])->name('un_waitress_majo');
+
+Route::get('/tambah_pesanan_majo', [MejaController::class, 'tambah_pesanan_majo'])->name('tambah_pesanan_majo');
+
+Route::get('/get_harga_majo', [MejaController::class, 'get_harga_majo'])->name('get_harga_majo');
+Route::get('/save_pesanan_majo', [MejaController::class, 'save_pesanan_majo'])->name('save_pesanan_majo');
+
+Route::get('/dataOrderan_majo', [dataOrderanController::class, 'dataOrderan_majo'])->name('dataOrderan_majo');
+Route::get('/hapus_majo', [dataOrderanController::class, 'hapus_majo'])->name('hapus_majo');
+Route::get('/laporan_penjualan_majo', [dataOrderanController::class, 'laporan_penjualan_majo'])->name('laporan_penjualan_majo');
+
+
+
+// majoo
+Route::get('/produk', [ProdukController::class, 'index'])->name('produk');
+
+Route::post('/tbh_produk_majo', [ProdukController::class, 'tbh_produk_majo'])->name('tbh_produk_majo');
+Route::get('/delete_majo', [ProdukController::class, 'delete'])->name('delete_majo');
+Route::post('/edit_majo', [ProdukController::class, 'edit'])->name('edit_majo');
+Route::GET('/get_edit_majo', [ProdukController::class, 'get_edit_majo'])->name('get_edit_majo');
+
+
+
+// Opname majoo
+Route::get('/opname_majo', [OpnamemajoController::class, 'index'])->name('opname_majo');
+Route::get('/buatOpname', [OpnamemajoController::class, 'buatOpname'])->name('buatOpname');
+Route::post('/inputOpname', [OpnamemajoController::class, 'inputOpname'])->name('inputOpname');
+Route::get('/detailOpname', [OpnamemajoController::class, 'detailOpname'])->name('detailOpname');
+Route::post('/editStokAktual', [OpnamemajoController::class, 'editStokAktual'])->name('editStokAktual');
+Route::get('/printOpname', [OpnamemajoController::class, 'printOpname'])->name('printOpname');
+Route::get('/formulirOpname', [OpnamemajoController::class, 'formulirOpname'])->name('formulirOpname');
+Route::get('/deleteOpname', [OpnamemajoController::class, 'deleteOpname'])->name('deleteOpname');
+Route::get('/tambahOpname', [OpnamemajoController::class, 'tambahOpname'])->name('tambahOpname');
+
+
+// stok masuk majo
+Route::get('/stok_masuk', [StokmasukController::class, 'index'])->name('stok_masuk');
+Route::get('/buatStokProduk', [StokmasukController::class, 'buatStokProduk'])->name('buatStokProduk');
+Route::get('/inputProdukMasuk', [StokmasukController::class, 'inputProdukMasuk'])->name('inputProdukMasuk');
+Route::get('/detailStokProduk', [StokmasukController::class, 'detailStokProduk'])->name('detailStokProduk');
+
+
+// delete bersakala
+Route::get('/delete_berskala', [Delete_berskala::class, 'index'])->name('delete_berskala');
+Route::post('/delete_data', [Delete_berskala::class, 'delete'])->name('delete_data');
+
+Route::get('/dataOrderan_majo', [dataOrderanController::class, 'dataOrderan_majo'])->name('dataOrderan_majo');
+Route::get('/hapus_majo', [dataOrderanController::class, 'hapus_majo'])->name('hapus_majo');
+Route::get('/laporan_penjualan_majo', [dataOrderanController::class, 'laporan_penjualan_majo'])->name('laporan_penjualan_majo');

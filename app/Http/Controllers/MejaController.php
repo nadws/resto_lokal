@@ -9,6 +9,7 @@ use App\Models\Orderan;
 use App\Models\Transaksi;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use App\Models\Pembelian;
 
 class MejaController extends Controller
 {
@@ -50,7 +51,7 @@ class MejaController extends Controller
         $lokasi = $request->session()->get('id_lokasi');
         $distribusi = DB::select(
             DB::raw("SELECT a.*, c.jumlah
-            FROM tb_distribusi AS a 
+            FROM tb_distribusi AS a
             LEFT JOIN (SELECT b.id_distribusi , COUNT(b.id_order) AS jumlah
             FROM tb_order AS b
             WHERE b.selesai = 'diantar' and b.id_lokasi = '$lokasi' AND void = 0
@@ -59,10 +60,10 @@ class MejaController extends Controller
         );
         $orderan = DB::select(
             DB::raw(
-                "SELECT 
-            COUNT(id_order) as jml_order 
-            FROM tb_order as a 
-            WHERE a.id_lokasi = '$lokasi' AND a.id_distribusi = '$id' AND selesai = 'diantar' AND void = 0 
+                "SELECT
+            COUNT(id_order) as jml_order
+            FROM tb_order as a
+            WHERE a.id_lokasi = '$lokasi' AND a.id_distribusi = '$id' AND selesai = 'diantar' AND void = 0
             group by a.id_distribusi",
             ),
         );
@@ -111,8 +112,8 @@ class MejaController extends Controller
         FROM tb_order AS a
         left join tb_meja as c on c.id_meja = a.id_meja
         LEFT JOIN tb_distribusi AS b ON b.id_distribusi = a.id_distribusi
-        LEFT JOIN ( 
-        SELECT d.no_order , SUM(d.qty) qty2 FROM tb_order2 AS d 
+        LEFT JOIN (
+        SELECT d.no_order , SUM(d.qty) qty2 FROM tb_order2 AS d
         GROUP BY d.no_order
         ) AS e ON e.no_order = a.no_order
         WHERE a.aktif = '1' and  a.id_lokasi = '$loc' and a.id_distribusi = '$id_distribusi' AND a.void = 0
@@ -280,18 +281,23 @@ class MejaController extends Controller
     {
         $id = $request->no;
         $order =  DB::select(
-            DB::raw("SELECT a.id_order, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai, a.harga,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.ongkir, a.id_distribusi
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
-            where   a.no_order = '$id' AND a.void = 0 
+            where   a.no_order = '$id' AND a.void = 0
             GROUP BY a.id_harga
             "),
         );
+        $majo = DB::select("SELECT a.tanggal, a.no_nota, a.nm_karyawan, b.nm_produk, a.id_karyawan,  a.jumlah, a.harga, a.total
+        FROM tb_pembelian AS a
+        LEFT JOIN tb_produk AS b ON b.id_produk = a.id_produk
+        WHERE a.no_nota= '$id'
+        ");
         $data = [
             'order' => $order,
             'no_order' => $id,
@@ -306,6 +312,7 @@ class MejaController extends Controller
                 ->first(),
             'batas' => DB::table('tb_batas_ongkir')
                 ->first(),
+                'majo' => $majo
         ];
         return view('meja.bill', $data);
     }
@@ -324,7 +331,7 @@ class MejaController extends Controller
                             <label class="btn btn-default buying-selling">
                             <div class="checkbox-group required">
                                 <input type="radio"  name="admin" value="' . $value->nama . '" autocomplete="off" class="cart_id_karyawan option1">
-                            </div>	
+                            </div>
                                 <span class="radio-dot"></span>
                                 <span class="buying-selling-word">' . $value->nama . '</span>
                             </label>
@@ -337,11 +344,11 @@ class MejaController extends Controller
     {
         $id = $request->no;
         $order =  DB::select(
-            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.no_checker , a.print, a.copy_print
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
@@ -350,11 +357,11 @@ class MejaController extends Controller
             ORDER BY a.id_order DESC"),
         );
         $order3 =  DB::select(
-            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.no_checker , a.print, a.copy_print
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
@@ -364,11 +371,11 @@ class MejaController extends Controller
         );
 
         $order2 =  DB::select(
-            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.no_checker , a.print, a.copy_print
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
@@ -378,20 +385,9 @@ class MejaController extends Controller
         );
 
         $data = [
-            'order' => $order,
             'order2' => $order2,
             'order3' => $order3,
             'no_order' => $id,
-            'pesan_2'    => DB::table('tb_order as a')
-                ->select(DB::raw('a.*, sum(a.qty) as sum_qty ,  b.nm_meja'))
-                ->leftJoin('tb_meja as b', 'b.id_meja', '=', 'a.id_meja')
-                ->leftJoin('view_menu as c', 'c.id_harga', '=', 'a.id_harga')
-                ->where('a.no_order', $id)
-                ->where('c.tipe', 'food')
-                ->where('c.id_kategori','!=', '8')
-                ->where('a.no_checker', 'T')
-                ->groupBy('a.no_order')
-                ->first(),
             'pesan_3'    => DB::table('tb_order as a')
                 ->select(DB::raw('a.*, sum(a.qty) as sum_qty ,  b.nm_meja'))
                 ->leftJoin('tb_meja as b', 'b.id_meja', '=', 'a.id_meja')
@@ -411,14 +407,26 @@ class MejaController extends Controller
                 ->where('a.no_checker', 'T')
                 ->groupBy('a.no_order')
                 ->first(),
-            
+            'majo' => DB::select("SELECT a.tanggal, a.no_nota, a.nm_karyawan, b.nm_produk, a.id_karyawan,  a.jumlah, a.harga, a.total
+                        FROM tb_pembelian AS a
+                        LEFT JOIN tb_produk AS b ON b.id_produk = a.id_produk
+                        WHERE a.no_nota= '$id'
+                        "),
+            'majo_ttl' => DB::selectOne("SELECT a.tanggal, a.no_nota, a.nm_karyawan, b.nm_produk, a.id_karyawan,  sum(a.jumlah) as sum_qty, a.harga, a.total
+                        FROM tb_pembelian AS a
+                        LEFT JOIN tb_produk AS b ON b.id_produk = a.id_produk
+                        WHERE a.no_nota= '$id'
+                        group by a.no_nota
+                        "),
+            'meja' => DB::selectOne("SELECT a.warna, b.nm_meja
+                        FROM tb_order AS a
+                        LEFT JOIN tb_meja AS b ON b.id_meja = a.id_meja
+                        WHERE a.no_order = '$id'
+                        GROUP BY a.no_order ")
+
         ];
 
-        $data1 = [
-            'no_checker' => 'Y',
-            'print' => 'Y'
-        ];
-        Orderan::where('no_order', $id)->update($data1);
+
         return view('meja.checker', $data);
     }
 
@@ -426,15 +434,15 @@ class MejaController extends Controller
     {
         $id = $request->no;
         $order =  DB::select(
-            DB::raw("SELECT a.id_order, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.no_checker , a.print, a.copy_print
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
-            where a.aktif = '1' and a.copy_print = 'T' and a.no_order = '$id' 
+            where a.aktif = '1' and a.copy_print = 'T' and a.no_order = '$id'
             GROUP BY a.id_order
             ORDER BY a.id_order DESC"),
         );
@@ -463,11 +471,11 @@ class MejaController extends Controller
     {
         $id = $request->no;
         $order =  DB::select(
-            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.no_checker , a.print, a.copy_print
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
@@ -476,11 +484,11 @@ class MejaController extends Controller
             ORDER BY a.id_order DESC"),
         );
         $order3 =  DB::select(
-            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.no_checker , a.print, a.copy_print
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
@@ -490,11 +498,11 @@ class MejaController extends Controller
         );
 
         $order2 =  DB::select(
-            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.no_checker , a.print, a.copy_print
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
@@ -537,7 +545,7 @@ class MejaController extends Controller
                 ->where('a.checker_tamu', 'T')
                 ->groupBy('a.no_order')
                 ->first(),
-            
+
         ];
 
         $data1 = [
@@ -550,11 +558,11 @@ class MejaController extends Controller
     {
         $id = $request->no;
         $order =  DB::select(
-            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.no_checker , a.print, a.copy_print
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
@@ -563,11 +571,11 @@ class MejaController extends Controller
             ORDER BY a.id_order DESC"),
         );
         $order3 =  DB::select(
-            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.no_checker , a.print, a.copy_print
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
@@ -577,11 +585,11 @@ class MejaController extends Controller
         );
 
         $order2 =  DB::select(
-            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3, 
+            DB::raw("SELECT a.id_order, b.tipe, b.nm_menu, SUM(a.qty) as qty, a.request, c.nama AS koki1 , d.nama AS koki2, e.nama AS koki3,
             a.pengantar, a.id_meja, a.j_mulai, a.j_selesai, a.wait, a.selesai,
             timestampdiff(MINUTE, a.j_mulai,a.wait) AS selisih, a.no_checker , a.print, a.copy_print
-            FROM tb_order as a 
-            left join view_menu as b on a.id_harga = b.id_harga 
+            FROM tb_order as a
+            left join view_menu as b on a.id_harga = b.id_harga
             left join tb_karyawan as c on c.id_karyawan = a.id_koki1
             left join tb_karyawan as d on d.id_karyawan = a.id_koki2
             left join tb_karyawan as e ON e.id_karyawan = a.id_koki3
@@ -624,7 +632,7 @@ class MejaController extends Controller
                 ->where('a.copy_checkert_tamu', 'T')
                 ->groupBy('a.no_order')
                 ->first(),
-            
+
         ];
 
 
@@ -634,5 +642,148 @@ class MejaController extends Controller
         Orderan::where('no_order', $id)->update($data1);
 
         return view('meja.copy_checker_tamu', $data);
+    }
+
+    public function meja_selesai_majo(Request $request)
+    {
+        $id_pembelian = $request->kode;
+        $data = [
+            'selesai' => 'selesai',
+        ];
+        Pembelian::where('id_pembelian', $id_pembelian)->update($data);
+    }
+    public function pilih_waitress_majo(Request $request)
+    {
+        date_default_timezone_set('Asia/Makassar');
+        $id_pembelian = $request->kode;
+        $waitress = $request->kry;
+        $id = $request->id;
+
+        $data = [
+            'pengantar' => $waitress,
+        ];
+        Pembelian::where('id_pembelian', $id_pembelian)->update($data);
+    }
+    public function un_waitress_majo(Request $request)
+    {
+        $id_pembelian = $request->kode;
+        $data = [
+            'pengantar' => '',
+        ];
+        Pembelian::where('id_pembelian', $id_pembelian)->update($data);
+    }
+    public function get_harga_majo(Request $request)
+    {
+        $id_harga = $request->id_harga;
+        $dp = DB::table('tb_produk')
+            ->where('id_produk', $id_harga)
+            ->first();
+
+        echo "$dp->harga";
+    }
+
+    public function tambah_pesanan_majo(Request $request)
+    {
+        $lokasi = $request->session()->get('id_lokasi');
+        $no_order = $request->no;
+        $id_dis = $request->id;
+
+        if ($id_dis == '1' || $id_dis == '3') {
+            $produk =  DB::table('tb_produk')->where('id_lokasi', "$lokasi")->where('id_kategori', '!=', '11')->where('stok', '>', '0')->get();
+        } else {
+            $produk =  DB::table('tb_produk')->where('id_lokasi', "$lokasi")->where('id_kategori', '=', '11')->where('stok', '>', '0')->get();
+        }
+        $order = DB::table('tb_order')
+            ->where('no_order', $no_order)
+            ->where('id_lokasi', $lokasi)
+            ->groupBy('no_order')
+            ->first();
+
+        $data = [
+            'order' => $order,
+            'produk' => $produk
+        ];
+
+        return view('meja.tbh_menu_majo', $data)->render();
+    }
+
+    public function save_pesanan_majo(Request $r)
+    {
+        $kd_order = $r->kd_order;
+        $id_dis = $r->id_dis;
+        $id_harga_majo = $r->id_harga_majo;
+        $nota = $r->nota;
+        $meja = $r->meja;
+        $qty_majo = $r->qty_majo;
+        $hrg_majo = $r->hrg_majo;
+        $admin =  Auth::user()->nama;
+        $lokasi = $r->session()->get('id_lokasi');
+
+
+        $d_produk = DB::table('tb_produk')->where('id_produk', $id_harga_majo)->where('id_lokasi', $lokasi)->first();
+        $data = [
+            'id_karyawan'  => $nota[0],
+            'id_produk' => $id_harga_majo,
+            'no_nota' => $kd_order,
+            'jumlah' => $qty_majo,
+            'harga' => $hrg_majo,
+            'total' => $qty_majo * $hrg_majo,
+            'tanggal' => date('Y-m-d'),
+            'tgl_input' => date('Y-m-d H:i:s'),
+            'admin' => $admin,
+            'lokasi' => $lokasi,
+            'no_meja' => $meja,
+            'jml_komisi' => $d_produk->komisi
+        ];
+        $dataInsert = Pembelian::create($data);
+        $id_pembelian = $dataInsert->id;
+
+
+        $data2 = [
+            'no_order' => $kd_order,
+            'qty' => '1',
+            'id_meja' => $meja,
+            'id_distribusi' => $id_dis,
+            'selesai' => 'selesai',
+            'id_lokasi' => $lokasi,
+            'tgl' => date('Y-m-d'),
+            'j_mulai' => date('Y-m-d H:i:s'),
+            'aktif' => '1',
+        ];
+        Orderan::create($data2);
+
+        // $data_invoice = [
+        //     'no_nota' => $kd_order,
+        //     'total' => $qty_majo * $hrg_majo,
+        //     'tgl_jam' => date('Y-m-d'),
+        //     'tgl_input' => date('Y-m-d H:i:s'),
+        //     'admin' => $admin,
+        //     'lokasi' => $lokasi,
+        //     'no_meja' => $meja
+        // ];
+        // DB::table('tb_invoice')->insert($data_invoice);
+
+        $stok_baru = [
+            'stok' => $d_produk->stok -  $qty_majo
+        ];
+
+        DB::table('tb_produk')->where('id_produk', $id_harga_majo)->update($stok_baru);
+
+        if ($hrg_majo > 0) {
+            $subharga = $qty_majo * $hrg_majo;
+        } else {
+            $subharga = 0;
+        }
+        $komisi1 = $subharga * $d_produk->komisi / 100;
+        $komisi = $komisi1 / count($nota);
+        foreach ($nota as $id_karyawan) {
+            $data_komisi = [
+                'id_pembelian' => $id_pembelian,
+                'id_kry'  => $id_karyawan,
+                'komisi' => $komisi,
+                'tgl' => date('Y-m-d')
+            ];
+            DB::table('komisi')->insert($data_komisi);
+        }
     }
 }
