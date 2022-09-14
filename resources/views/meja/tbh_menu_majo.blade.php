@@ -7,7 +7,11 @@
         <label for="">Menu</label>
         <select name="id_harga[]" class="form-control id_harga_majo id_harga_majo1 select2bs4" detail="1" required>
             <option value="">-Pilih Menu-</option>
-            <?php foreach ($produk as $m) : ?>
+            <?php foreach ($produk as $m) : 
+            if (($m->debit - ($m->kredit + $m->kredit_penjualan)) <= 0) {
+                continue;
+            }
+            ?>
             <option value="{{ $m->id_produk }}">
                 {{ $m->nm_produk }}
             </option>

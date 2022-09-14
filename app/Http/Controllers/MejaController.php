@@ -706,7 +706,7 @@ class MejaController extends Controller
             GROUP BY e.id_produk
             )AS e ON e.id_produk = a.id_produk
             
-            WHERE a.id_lokasi = '$lokasi' and a.id_kategori != '11' and (d.debit - (d.kredit + e.kredit_penjualan)) > 0");
+            WHERE a.id_lokasi = '$lokasi' and a.id_kategori != '11' ");
         } else {
             $produk =  DB::select("SELECT a.id_produk, a.komisi,  a.nm_produk, a.sku, a.harga, b.satuan , c.nm_kategori, a.id_lokasi, d.debit, d.kredit,e.kredit_penjualan
             FROM tb_produk AS a
@@ -725,7 +725,7 @@ class MejaController extends Controller
             GROUP BY e.id_produk
             )AS e ON e.id_produk = a.id_produk
             
-            WHERE a.id_lokasi = '$lokasi' and a.id_kategori = '11' and (d.debit - (d.kredit + e.kredit_penjualan)) > 0");
+            WHERE a.id_lokasi = '$lokasi' and a.id_kategori = '11' ");
         }
         $order = DB::table('tb_order')
             ->where('no_order', $no_order)
