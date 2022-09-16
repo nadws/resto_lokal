@@ -441,7 +441,7 @@ Route::post('/editStokAktual', [OpnamemajoController::class, 'editStokAktual'])-
 Route::get('/printOpname', [OpnamemajoController::class, 'printOpname'])->name('printOpname');
 Route::get('/formulirOpname', [OpnamemajoController::class, 'formulirOpname'])->name('formulirOpname');
 Route::get('/deleteOpname', [OpnamemajoController::class, 'deleteOpname'])->name('deleteOpname');
-Route::get('/tambahOpname', [OpnamemajoController::class, 'tambahOpname'])->name('tambahOpname');
+Route::post('/inputOpname2', [OpnamemajoController::class, 'inputOpname2'])->name('inputOpname2');
 
 
 // stok masuk majo

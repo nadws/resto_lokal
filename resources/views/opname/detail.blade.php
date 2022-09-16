@@ -168,7 +168,7 @@
         overflow-y: auto;
     }
 </style>
-<form action="<?= route('tambahOpname') ?>" method="POST">
+<form action="<?= route('inputOpname2') ?>" method="post">
     @csrf
     <input type="hidden" name="kode_opname" value='<?= $kode_opname ?>'>
     <div class="modal fade" id="exampleModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel"
